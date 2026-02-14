@@ -1,5 +1,7 @@
 # QuadCalc — FPV Build Planner
 
+**[Live Demo](https://logicaleap.github.io/quadcalc/)**
+
 QuadCalc is a browser-based tool for planning FPV (First Person View) drone builds. It visualizes component relationships on an interactive diagram, checks compatibility between parts, and provides AI-assisted guidance — all without a backend.
 
 ## Quick Start

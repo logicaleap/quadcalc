@@ -4,6 +4,8 @@
 
 QuadCalc is a browser-based tool for planning FPV (First Person View) drone builds. It visualizes component relationships on an interactive diagram, checks compatibility between parts, and provides AI-assisted guidance — all without a backend.
 
+![QuadCalc Dark Mode](docs/screenshots/dark-mode.png)
+
 ## Quick Start
 
 ```bash
@@ -15,14 +17,24 @@ Open `http://localhost:5173` in your browser.
 
 ## What It Does
 
-- **Interactive Quad Diagram** — 13 component slots arranged radially around a top-down quadcopter SVG. Click any node to browse and select parts.
-- **Compatibility Engine** — 16 rule-based checks warn you when parts don't work together (wrong video system, mismatched voltage, incompatible mounting patterns, etc.).
+- **Interactive Quad Diagram** — 14 component slots arranged radially around a top-down quadcopter SVG. Click any node to browse and select parts.
+- **Compatibility Engine** — 19 rule-based checks warn you when parts don't work together (wrong video system, mismatched voltage, incompatible mounting patterns, etc.).
 - **AI Chat with Tool Calling** — The AI can search the preset database and directly assign components to your build. Ask it to "add a 5 inch frame" or "build me a fast quad, populate everything" and it will pick compatible parts. Supports `/help` for usage examples. Resizable panel (default / half / full screen).
 - **Undo/Redo** — Every component change is tracked. Use the undo/redo buttons in the top bar to step back and forward through your build history.
 - **Auto-Save Drafts** — Your build is automatically saved as you work. If you close the browser or refresh, your latest build is restored. Keeps the last 5 drafts.
 - **Save/Load/Export** — Save builds to localStorage, export as JSON or CSV, import from JSON files.
 - **URL Import** — Paste a product URL from any FPV store and the AI extracts component specs automatically.
-- **1,000+ Built-in Presets** — Pre-populated database of real FPV components across all 13 categories.
+- **1,000+ Built-in Presets** — Pre-populated database of real FPV components across all 14 categories.
+
+### Component Panel
+
+Click any node on the diagram to open the component panel. It shows the selected part's specs, compatibility alerts, and a searchable list of presets to choose from.
+
+![Component Panel](docs/screenshots/component-panel.png)
+
+### Light Mode
+
+![QuadCalc Light Mode](docs/screenshots/light-mode.png)
 
 ## Tech Stack
 
@@ -67,7 +79,7 @@ src/
 
 ## Presets Database
 
-The preset database lives in `src/data/presets.js`. It exports a single object with arrays for each of the 13 component categories:
+The preset database lives in `src/data/presets.js`. It exports a single object with arrays for each of the 14 component categories:
 
 ```js
 export const presets = {
@@ -82,7 +94,8 @@ export const presets = {
   rx: [...],          // Receivers
   tx: [...],          // Transmitters (radios)
   goggles: [...],
-  antenna: [...],
+  vtxAntenna: [...],  // 5.8GHz video antennas
+  rxAntenna: [...],   // 2.4GHz/900MHz control-link antennas
   other: [...],       // Accessories, action cameras, tools, etc.
 }
 ```
@@ -119,7 +132,8 @@ Every preset follows this shape:
 | `rx` | `protocol` ("ELRS"/"Crossfire"/"FrSky"/"FlySky"), `frequency`, `antenna`, `telemetry` |
 | `tx` | `protocol`, `frequency`, `channels`, `display`, `gimbal` |
 | `goggles` | `system`, `resolution`, `fov`, `dvr`, `diversity` |
-| `antenna` | `frequency`, `type` ("RHCP"/"LHCP"), `gain`, `connector` |
+| `vtxAntenna` | `frequency` ("5.8GHz"), `type` ("RHCP"/"LHCP"), `gain`, `connector` |
+| `rxAntenna` | `frequency` ("2.4GHz"/"900MHz"/"868MHz"), `type`, `gain`, `connector` |
 | `other` | Freeform — any relevant specs |
 
 ### Adding Presets
@@ -144,6 +158,8 @@ Defined in `src/data/compatibilityRules.js`. Each rule specifies which two categ
 - RX and TX must use the same radio protocol
 - Battery voltage must be within ESC and FC ratings
 - Mounting patterns must be compatible between FC/ESC and frame
+- VTX antenna connector must match VTX connector
+- RX antenna frequency must match receiver frequency
 
 ## Configuration
 

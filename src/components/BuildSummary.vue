@@ -121,7 +121,8 @@ const CATEGORY_COLORS = {
   rx: '#00e5ff',
   tx: '#76ff03',
   goggles: '#ffd740',
-  antenna: '#ff4081',
+  vtxAntenna: '#ff4081',
+  rxAntenna: '#ff80ab',
   other: '#8d6e63',
 }
 

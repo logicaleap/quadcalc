@@ -15,7 +15,8 @@ export const templates = [
       rx: 'rx-elrs-ep1',
       tx: 'tx-radiomaster-pocket',
       goggles: 'gog-skyzone-04x',
-      antenna: 'ant-lollipop',
+      vtxAntenna: 'ant-lollipop-mmcx',
+      rxAntenna: 'ant-elrs-24',
     },
   },
   {
@@ -34,7 +35,8 @@ export const templates = [
       rx: 'rx-elrs-radiomaster',
       tx: 'tx-radiomaster-tx16s',
       goggles: 'gog-dji-v2',
-      antenna: 'ant-axii-hd',
+      vtxAntenna: 'ant-dji-o3-ant',
+      rxAntenna: 'ant-elrs-24',
     },
   },
   {
@@ -53,7 +55,8 @@ export const templates = [
       rx: 'rx-elrs-ep1',
       tx: 'tx-radiomaster-zorro',
       goggles: 'gog-eachine-ev800d',
-      antenna: 'ant-lollipop',
+      vtxAntenna: 'ant-lollipop-ufl',
+      rxAntenna: 'ant-elrs-24-ceramic',
     },
   },
   {
@@ -72,7 +75,8 @@ export const templates = [
       rx: 'rx-elrs-matek',
       tx: 'tx-radiomaster-tx16s',
       goggles: 'gog-skyzone-04x',
-      antenna: 'ant-axii-2',
+      vtxAntenna: 'ant-lollipop-mmcx',
+      rxAntenna: 'ant-elrs-24',
     },
   },
   {
@@ -91,7 +95,8 @@ export const templates = [
       rx: 'rx-elrs-ep1',
       tx: 'tx-radiomaster-pocket',
       goggles: 'gog-eachine-ev800d',
-      antenna: 'ant-lollipop-ufl',
+      vtxAntenna: 'ant-lollipop-ufl',
+      rxAntenna: 'ant-elrs-24-ceramic',
     },
   },
 ]

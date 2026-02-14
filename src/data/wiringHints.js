@@ -5,6 +5,6 @@ export const wiringHints = [
   { categories: ['fc', 'camera'], hint: 'Analog camera: connect to FC camera input pad. DJI/HDZero: connect to Air Unit which handles camera signal.' },
   { categories: ['esc', 'motors'], hint: 'Solder 3 motor wires to ESC motor pads. Swap any 2 wires to reverse direction if needed.' },
   { categories: ['battery', 'esc'], hint: 'Battery XT60/XT30 connects to ESC power input. Add capacitor (1000uF low-ESR) across battery pads to reduce voltage spikes.' },
-  { categories: ['vtx', 'antenna'], hint: 'Connect antenna to VTX SMA/MMCX/UFL connector. NEVER power VTX without antenna attached \u2014 it will burn out.' },
-  { categories: ['rx', 'antenna'], hint: 'Mount RX antenna(s) at 90-degree angles for best reception. Keep away from carbon fiber and ESC noise.' },
+  { categories: ['vtx', 'vtxAntenna'], hint: 'Connect VTX antenna to VTX SMA/MMCX/UFL connector. NEVER power VTX without antenna attached \u2014 it will burn out.' },
+  { categories: ['rx', 'rxAntenna'], hint: 'Mount RX antenna(s) at 90-degree angles for best reception. Keep away from carbon fiber and ESC noise.' },
 ]

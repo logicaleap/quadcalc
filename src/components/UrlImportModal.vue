@@ -205,7 +205,8 @@ Category-specific specs schemas:
 - rx: { protocol: "ELRS"|"Crossfire"|"FrSky"|"FlySky", frequency: "2.4GHz", antenna: "Wire", telemetry: true }
 - tx: { protocol: "ELRS"|"Crossfire"|"FrSky"|"FlySky", frequency: "2.4GHz", channels: 16, display: "Color LCD", gimbal: "Hall" }
 - goggles: { system: "Analog"|"DJI"|"HDZero"|"Walksnail", resolution: "1920x1080", fov: 46, dvr: true, diversity: true }
-- antenna: { frequency: "5.8GHz", type: "RHCP", gain: "2.8dBi", connector: "SMA" }
+- vtxAntenna: { frequency: "5.8GHz", type: "RHCP", gain: "2.8dBi", connector: "SMA" }
+- rxAntenna: { frequency: "2.4GHz", type: "Dipole", gain: "2dBi", connector: "UFL" }
 - other: { } (any relevant specs)
 
 If you can't determine the price, set cost to 0. If you can't determine weight, set weight to 0.

@@ -3,7 +3,9 @@ import { useBuildStore } from '../stores/buildStore.js'
 import { CATEGORIES, formatCurrency, formatWeight } from '../utils/helpers.js'
 import { presets } from '../data/presets.js'
 
-const SHARE_KEYS = { f: 'frame', m: 'motors', pr: 'propellers', b: 'battery', fc: 'fc', e: 'esc', v: 'vtx', ca: 'camera', r: 'rx', t: 'tx', g: 'goggles', a: 'antenna', o: 'other' }
+const SHARE_KEYS = { f: 'frame', m: 'motors', pr: 'propellers', b: 'battery', fc: 'fc', e: 'esc', v: 'vtx', va: 'vtxAntenna', ca: 'camera', r: 'rx', ra: 'rxAntenna', t: 'tx', g: 'goggles', o: 'other' }
+// Legacy key for backwards compat with old shared URLs
+const LEGACY_SHARE_KEYS = { a: 'vtxAntenna' }
 const SHARE_KEYS_REV = Object.fromEntries(Object.entries(SHARE_KEYS).map(([k, v]) => [v, k]))
 
 const STORAGE_KEY = 'quadcalc_builds'
@@ -142,11 +144,20 @@ export function useStorage() {
       const ids = JSON.parse(atob(b64))
       const comps = {}
       for (const [shortKey, presetId] of Object.entries(ids)) {
-        const cat = SHARE_KEYS[shortKey]
-        if (!cat) continue
-        const list = presets[cat] || []
-        const found = list.find(p => p.id === presetId)
-        if (found) comps[cat] = { ...found, category: cat }
+        let cat = SHARE_KEYS[shortKey]
+        if (cat) {
+          const list = presets[cat] || []
+          const found = list.find(p => p.id === presetId)
+          if (found) comps[cat] = { ...found, category: cat }
+        } else if (shortKey === 'a') {
+          // Legacy 'antenna' key — try vtxAntenna first, then rxAntenna
+          const vtxList = presets.vtxAntenna || []
+          const rxList = presets.rxAntenna || []
+          const inVtx = vtxList.find(p => p.id === presetId)
+          const inRx = rxList.find(p => p.id === presetId)
+          if (inVtx) comps.vtxAntenna = { ...inVtx, category: 'vtxAntenna' }
+          else if (inRx) comps.rxAntenna = { ...inRx, category: 'rxAntenna' }
+        }
       }
       if (Object.keys(comps).length === 0) return false
       const store = useBuildStore()

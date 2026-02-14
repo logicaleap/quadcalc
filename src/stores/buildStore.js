@@ -11,6 +11,20 @@ function emptyBuild() {
   return components
 }
 
+// Migrate old 'antenna' key to vtxAntenna/rxAntenna based on frequency
+function migrateAntennaKey(comps) {
+  if (!comps || !comps.antenna) return comps
+  const ant = comps.antenna
+  const freq = ant.specs?.frequency
+  if (freq === '5.8GHz') {
+    if (!comps.vtxAntenna) comps.vtxAntenna = { ...ant, category: 'vtxAntenna' }
+  } else {
+    if (!comps.rxAntenna) comps.rxAntenna = { ...ant, category: 'rxAntenna' }
+  }
+  delete comps.antenna
+  return comps
+}
+
 function snapshotComponents(comps) {
   return JSON.parse(JSON.stringify(comps))
 }
@@ -191,7 +205,7 @@ export const useBuildStore = defineStore('build', () => {
   function loadBuild(build) {
     pushUndo()
     buildName.value = build.name || 'Loaded Build'
-    const comps = build.components || {}
+    const comps = migrateAntennaKey(build.components || {})
     Object.keys(components.value).forEach(k => {
       components.value[k] = comps[k] || null
     })
@@ -221,9 +235,10 @@ export const useBuildStore = defineStore('build', () => {
   if (!hasComponents) {
     const draft = loadLatestDraft()
     if (draft && draft.components) {
+      const draftComps = migrateAntennaKey(draft.components)
       buildName.value = draft.name || 'Untitled Build'
       Object.keys(components.value).forEach(k => {
-        components.value[k] = draft.components[k] || null
+        components.value[k] = draftComps[k] || null
       })
     }
   }

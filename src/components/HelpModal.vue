@@ -17,7 +17,7 @@
                 from the drone's camera. It's like a video game, but real.
               </p>
               <p>
-                Building your own drone means picking about 13 different parts that all need to work
+                Building your own drone means picking about 14 different parts that all need to work
                 together. That's where QuadCalc comes in — it checks if your parts are compatible and
                 warns you before you buy something that won't fit.
               </p>
@@ -26,7 +26,7 @@
             <section>
               <h4>The Diagram</h4>
               <p>
-                The center of the screen shows a top-down view of a quadcopter with 13 component
+                The center of the screen shows a top-down view of a quadcopter with 14 component
                 slots arranged around it. Each circle represents a part of your build.
               </p>
               <ul>
@@ -81,7 +81,7 @@
             </section>
 
             <section>
-              <h4>The 13 Parts Explained</h4>
+              <h4>The 14 Parts Explained</h4>
               <div class="parts-grid">
                 <div><span class="part-name">Frame</span> — The carbon fiber skeleton that holds everything together. Size (3", 5", 7") determines what other parts you need.</div>
                 <div><span class="part-name">Motors (x4)</span> — Spin the propellers. Bigger motors = more power. Stator size (like 2306) should match your frame size.</div>
@@ -94,7 +94,8 @@
                 <div><span class="part-name">Receiver (RX)</span> — Receives control signals from your handheld transmitter.</div>
                 <div><span class="part-name">Transmitter (TX)</span> — The handheld controller you hold. Sends stick inputs to the receiver.</div>
                 <div><span class="part-name">Goggles</span> — What you wear to see the live video feed. Must match VTX/camera system.</div>
-                <div><span class="part-name">Antenna</span> — For video or control signal. Better antennas = better range and image.</div>
+                <div><span class="part-name">VTX Antenna</span> — Connects to the VTX for video transmission. 5.8GHz, various connector types (SMA, MMCX, UFL).</div>
+                <div><span class="part-name">RX Antenna</span> — Connects to the receiver for control link. Must match the receiver's frequency (2.4GHz, 900MHz, etc.).</div>
                 <div><span class="part-name">Other</span> — Accessories: GPS, buzzer, LEDs, action camera, etc.</div>
               </div>
             </section>

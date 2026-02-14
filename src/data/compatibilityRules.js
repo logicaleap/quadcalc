@@ -330,24 +330,46 @@ export const compatibilityRules = [
   },
 
   // ═══════════════════════════════════════════════════
-  // VTX ↔ ANTENNA: Connector type must match
+  // VTX ↔ VTX ANTENNA: Connector type must match
   // ═══════════════════════════════════════════════════
   {
-    id: 'vtx-antenna-connector',
-    name: 'VTX ↔ Antenna Connector',
-    description: 'VTX and antenna RF connectors must match (SMA, MMCX, UFL, RP-SMA). Mismatched connectors need adapters that add weight and signal loss.',
-    categories: ['vtx', 'antenna'],
+    id: 'vtx-vtxAntenna-connector',
+    name: 'VTX ↔ VTX Antenna Connector',
+    description: 'VTX and VTX antenna RF connectors must match (SMA, MMCX, UFL, RP-SMA). Mismatched connectors need adapters that add weight and signal loss.',
+    categories: ['vtx', 'vtxAntenna'],
     severity: 'warning',
     check(vtx, antenna) {
       if (!vtx.specs?.connector || !antenna.specs?.connector) return null
-      if (antenna.specs.frequency !== '5.8GHz') return null
       const vtxConn = vtx.specs.connector
       const antConn = antenna.specs.connector
       if (vtxConn === antConn) return null
       const smaFamily = new Set(['SMA', 'RP-SMA'])
       if (smaFamily.has(vtxConn) && smaFamily.has(antConn))
-        return `VTX has ${vtxConn} but antenna is ${antConn}. You'll need a simple SMA↔RP-SMA adapter — cheap and minimal signal loss.`
-      return `VTX has ${vtxConn} but antenna is ${antConn}. You'll need a ${vtxConn}↔${antConn} adapter pigtail, which adds weight and signal loss.`
+        return `VTX has ${vtxConn} but VTX antenna is ${antConn}. You'll need a simple SMA↔RP-SMA adapter — cheap and minimal signal loss.`
+      return `VTX has ${vtxConn} but VTX antenna is ${antConn}. You'll need a ${vtxConn}↔${antConn} adapter pigtail, which adds weight and signal loss.`
+    },
+  },
+
+  // ═══════════════════════════════════════════════════
+  // RX ↔ RX ANTENNA: Frequency band must match
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'rx-rxAntenna-frequency',
+    name: 'RX ↔ RX Antenna Frequency',
+    description: 'Receiver and RX antenna must operate on the same frequency band (2.4GHz, 900MHz, 868MHz). Mismatched frequencies mean no signal.',
+    categories: ['rx', 'rxAntenna'],
+    severity: 'error',
+    check(rx, antenna) {
+      if (!rx.specs?.frequency || !antenna.specs?.frequency) return null
+      const rxFreq = rx.specs.frequency
+      const antFreq = antenna.specs.frequency
+      // Normalize dual-band RX frequencies (e.g. "868/915MHz" matches "868MHz")
+      const rxFreqs = rxFreq.split('/').map(f => f.replace(/\s/g, ''))
+      const antFreqs = antFreq.split('/').map(f => f.replace(/\s/g, ''))
+      // Check if any frequency overlaps
+      const hasOverlap = rxFreqs.some(rf => antFreqs.some(af => rf === af))
+      if (hasOverlap) return null
+      return `Receiver operates on ${rxFreq} but RX antenna is ${antFreq}. The antenna must match the receiver's frequency band.`
     },
   },
 ]
@@ -374,5 +396,6 @@ export const compatibilityExplanations = {
   'battery-frame-size': 'Small frames need small, light batteries. Large frames need powerful batteries for adequate flight time.',
   'motor-esc-current': 'The ESC current rating must exceed the motor\'s peak current draw. Underpowered ESCs can overheat and fail mid-flight.',
   'fc-esc-aio': 'AIO (All-in-One) flight controllers have the ESC built onto the same board. Adding a separate standalone ESC is redundant unless you specifically need higher current capacity than the integrated one provides.',
-  'vtx-antenna-connector': 'VTX and antenna connect via an RF connector. Common types are SMA, RP-SMA, MMCX, and UFL. Mismatched connectors require adapter pigtails that add weight, bulk, and signal loss. SMA↔RP-SMA adapters are simple screw-on and cause minimal loss.',
+  'vtx-vtxAntenna-connector': 'VTX and its antenna connect via an RF connector. Common types are SMA, RP-SMA, MMCX, and UFL. Mismatched connectors require adapter pigtails that add weight, bulk, and signal loss. SMA↔RP-SMA adapters are simple screw-on and cause minimal loss.',
+  'rx-rxAntenna-frequency': 'The receiver antenna must operate on the same frequency band as the receiver. ELRS 2.4GHz receivers need a 2.4GHz antenna, 900MHz receivers need a 900MHz antenna, Crossfire uses 868MHz, etc. Using the wrong frequency band means no signal reception.',
 }

@@ -25,11 +25,12 @@ export const CATEGORIES = [
   { key: 'fc', label: 'Flight Controller', icon: 'fc' },
   { key: 'esc', label: 'ESC', icon: 'esc' },
   { key: 'vtx', label: 'VTX', icon: 'vtx' },
+  { key: 'vtxAntenna', label: 'VTX Antenna', icon: 'antenna' },
   { key: 'camera', label: 'Camera', icon: 'camera' },
   { key: 'rx', label: 'Receiver (RX)', icon: 'rx' },
+  { key: 'rxAntenna', label: 'RX Antenna', icon: 'antenna' },
   { key: 'tx', label: 'Transmitter (TX)', icon: 'tx' },
   { key: 'goggles', label: 'Goggles', icon: 'goggles' },
-  { key: 'antenna', label: 'Antenna', icon: 'antenna' },
   { key: 'other', label: 'Other', icon: 'other' },
 ]
 

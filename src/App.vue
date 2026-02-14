@@ -38,6 +38,9 @@
     <!-- AI Chat (bottom right) -->
     <AiChat />
 
+    <!-- Credits -->
+    <div class="credits">Built by Asaf Shamir</div>
+
     <!-- Modals -->
     <SaveLoadModal :show="showSaveLoad" @close="showSaveLoad = false" />
     <SettingsModal :show="showSettings" @close="showSettings = false" />
@@ -100,5 +103,17 @@ const showHelp = ref(false)
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+.credits {
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  font-size: 11px;
+  color: rgba(0, 240, 255, 0.3);
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+  z-index: 10;
+  pointer-events: none;
 }
 </style>

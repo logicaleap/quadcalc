@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { CATEGORIES } from '../utils/helpers.js'
 
 function emptyBuild() {
@@ -8,10 +8,52 @@ function emptyBuild() {
   return components
 }
 
+function snapshotComponents(comps) {
+  return JSON.parse(JSON.stringify(comps))
+}
+
 export const useBuildStore = defineStore('build', () => {
   const components = ref(emptyBuild())
   const buildName = ref('Untitled Build')
   const selectedCategory = ref(null)
+
+  // Undo/redo history
+  const undoStack = ref([])
+  const redoStack = ref([])
+  const MAX_HISTORY = 50
+  let skipSnapshot = false
+
+  function pushUndo() {
+    if (skipSnapshot) return
+    undoStack.value.push(snapshotComponents(components.value))
+    if (undoStack.value.length > MAX_HISTORY) undoStack.value.shift()
+    redoStack.value = []
+  }
+
+  const canUndo = computed(() => undoStack.value.length > 0)
+  const canRedo = computed(() => redoStack.value.length > 0)
+
+  function undo() {
+    if (!canUndo.value) return
+    redoStack.value.push(snapshotComponents(components.value))
+    const prev = undoStack.value.pop()
+    skipSnapshot = true
+    Object.keys(components.value).forEach(k => {
+      components.value[k] = prev[k] || null
+    })
+    skipSnapshot = false
+  }
+
+  function redo() {
+    if (!canRedo.value) return
+    undoStack.value.push(snapshotComponents(components.value))
+    const next = redoStack.value.pop()
+    skipSnapshot = true
+    Object.keys(components.value).forEach(k => {
+      components.value[k] = next[k] || null
+    })
+    skipSnapshot = false
+  }
 
   const filledCount = computed(() =>
     Object.values(components.value).filter(Boolean).length
@@ -35,6 +77,7 @@ export const useBuildStore = defineStore('build', () => {
   )
 
   function setComponent(category, component) {
+    pushUndo()
     if (component) {
       components.value[category] = { ...component, category }
     } else {
@@ -43,15 +86,18 @@ export const useBuildStore = defineStore('build', () => {
   }
 
   function clearComponent(category) {
+    pushUndo()
     components.value[category] = null
   }
 
   function clearAll() {
+    pushUndo()
     Object.keys(components.value).forEach(k => { components.value[k] = null })
     buildName.value = 'Untitled Build'
   }
 
   function loadBuild(build) {
+    pushUndo()
     buildName.value = build.name || 'Loaded Build'
     const comps = build.components || {}
     Object.keys(components.value).forEach(k => {
@@ -74,6 +120,10 @@ export const useBuildStore = defineStore('build', () => {
     filledCount,
     totalCost,
     totalWeight,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
     setComponent,
     clearComponent,
     clearAll,

@@ -5,7 +5,10 @@
     <!-- Top bar -->
     <header class="top-bar">
       <div class="flex items-center gap-3">
-        <h1 class="text-tron-cyan text-base font-bold tracking-widest glow-text-cyan">QUADCALC</h1>
+        <div>
+          <h1 class="text-tron-cyan text-base font-bold tracking-widest glow-text-cyan">QUADCALC</h1>
+          <span class="browser-storage-note">All data saved locally in your browser</span>
+        </div>
         <span class="text-tron-text/20 text-xs font-mono hidden sm:inline">FPV BUILD PLANNER</span>
       </div>
       <div class="flex items-center gap-2">
@@ -103,6 +106,15 @@ const showHelp = ref(false)
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+.browser-storage-note {
+  display: block;
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(255, 200, 50, 0.4);
+  letter-spacing: 0.5px;
+  margin-top: 1px;
 }
 
 .credits {

@@ -17,7 +17,8 @@ Open `http://localhost:5173` in your browser.
 
 - **Interactive Quad Diagram** — 13 component slots arranged radially around a top-down quadcopter SVG. Click any node to browse and select parts.
 - **Compatibility Engine** — 16 rule-based checks warn you when parts don't work together (wrong video system, mismatched voltage, incompatible mounting patterns, etc.).
-- **AI Chat** — Ask questions about your build using any OpenRouter-compatible model. The AI sees your current build and can suggest parts or diagnose issues.
+- **AI Chat with Tool Calling** — The AI can search the preset database and directly assign components to your build. Ask it to "add a 5 inch frame" or "build me a fast quad, populate everything" and it will pick compatible parts. Supports `/help` for usage examples. Resizable panel (default / half / full screen).
+- **Undo/Redo** — Every component change is tracked. Use the undo/redo buttons in the top bar to step back and forward through your build history.
 - **Save/Load/Export** — Save builds to localStorage, export as JSON or CSV, import from JSON files.
 - **URL Import** — Paste a product URL from any FPV store and the AI extracts component specs automatically.
 - **1,000+ Built-in Presets** — Pre-populated database of real FPV components across all 13 categories.
@@ -49,8 +50,8 @@ src/
 │   ├── ComponentPanel.vue           # Right-side panel: specs, alerts, preset picker
 │   ├── ComponentSelector.vue        # Searchable preset browser
 │   ├── CompatibilityAlerts.vue      # Bottom-left compatibility warnings
-│   ├── BuildSummary.vue             # Top-center: cost, weight, part count, compat %
-│   ├── AiChat.vue                   # Floating AI chat panel (OpenRouter)
+│   ├── BuildSummary.vue             # Top-center: undo/redo, cost, weight, parts, compat %
+│   ├── AiChat.vue                   # Floating AI chat with tool-calling (resizable)
 │   ├── SaveLoadModal.vue            # Save/load/export/import builds
 │   ├── SettingsModal.vue            # API key and model configuration
 │   ├── UrlImportModal.vue           # AI-powered product URL scanner
@@ -125,6 +126,13 @@ Every preset follows this shape:
 **In code:** Add items directly to the arrays in `presets.js` following the format above.
 
 **At runtime:** Users can add custom presets via the "Import URL" feature or by selecting "Add to My Presets" after scanning a product. Custom presets are stored in localStorage under `quadcalc_custom_presets` and appear alongside built-in ones.
+
+## Pricing & Weight Assumptions
+
+- All prices are in **USD** (stored in cents, e.g. `3999` = $39.99)
+- **Motor cost and weight** are multiplied by 4 (per-unit pricing/weight)
+- **Propeller weight** is multiplied by 4 (per-prop weight), but **cost is NOT** (sold in packs)
+- Prices are approximate and for reference only
 
 ## Compatibility Rules
 

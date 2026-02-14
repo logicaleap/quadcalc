@@ -1,6 +1,12 @@
 <template>
   <div class="build-summary tron-panel">
     <div class="flex items-center gap-3">
+      <!-- Undo/Redo -->
+      <div class="flex items-center gap-1 mr-1">
+        <button class="undo-btn tron-btn" :disabled="!store.canUndo" @click="store.undo()" title="Undo">&#x21A9;</button>
+        <button class="undo-btn tron-btn" :disabled="!store.canRedo" @click="store.redo()" title="Redo">&#x21AA;</button>
+      </div>
+
       <!-- Compat Score -->
       <div class="stat-block" :class="scoreClass">
         <div class="stat-value">{{ compatibilityScore }}%</div>
@@ -80,4 +86,18 @@ const scoreClass = computed(() => {
 .score-good .stat-value { color: var(--color-tron-green); }
 .score-warn .stat-value { color: var(--color-tron-yellow); }
 .score-bad .stat-value { color: var(--color-tron-red); }
+
+.undo-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  padding: 0;
+}
+.undo-btn:disabled {
+  opacity: 0.2;
+  cursor: not-allowed;
+}
 </style>

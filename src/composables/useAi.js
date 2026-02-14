@@ -70,6 +70,32 @@ const TOOL_DEFINITIONS = [
   },
 ]
 
+const HELP_TEXT = `**QuadCalc AI** can help you build your FPV drone. Here's what you can ask:
+
+**Add components:**
+\`Add a 5 inch frame\`
+\`Set up ELRS radio\`
+\`Add budget motors for a 5" build\`
+
+**Get suggestions:**
+\`What motor should I use?\`
+\`Suggest a battery for my build\`
+\`What video system is best for beginners?\`
+
+**Check your build:**
+\`Is my build compatible?\`
+\`What's wrong with my setup?\`
+\`What am I missing?\`
+
+**Remove components:**
+\`Remove the frame\`
+\`Clear the motors\`
+
+**General FPV questions:**
+\`What does KV mean?\`
+\`Difference between 4S and 6S?\`
+\`What is ELRS?\``
+
 function searchPresets(category, query) {
   const items = presets[category]
   if (!items) return { error: `Unknown category: ${category}`, count: 0, results: [] }
@@ -139,6 +165,69 @@ function executeToolCall(toolCall, store) {
   }
 }
 
+// Parse Gemini-style tool_code blocks from text content
+// e.g. "```tool_code\nprint(default_api.search_presets(category="frame", query="5"))\n```"
+function parseInlineToolCalls(text) {
+  const calls = []
+  // Match tool_code blocks or bare function calls
+  const codeBlockPattern = /```(?:tool_code|python)?\s*\n?([\s\S]*?)```/g
+  let match
+  while ((match = codeBlockPattern.exec(text)) !== null) {
+    const code = match[1].trim()
+    const fnCalls = extractFunctionCalls(code)
+    calls.push(...fnCalls)
+  }
+  // Also try bare print(...) calls without code blocks
+  if (calls.length === 0) {
+    const barePattern = /(?:print\()?default_api\.(\w+)\(([^)]*)\)\)?/g
+    while ((match = barePattern.exec(text)) !== null) {
+      const parsed = parseFnCall(match[1], match[2])
+      if (parsed) calls.push(parsed)
+    }
+  }
+  return calls
+}
+
+function extractFunctionCalls(code) {
+  const calls = []
+  const pattern = /(?:print\()?(?:default_api\.)?(\w+)\(([^)]*)\)\)?/g
+  let match
+  while ((match = pattern.exec(code)) !== null) {
+    const parsed = parseFnCall(match[1], match[2])
+    if (parsed) calls.push(parsed)
+  }
+  return calls
+}
+
+function parseFnCall(fnName, argsStr) {
+  const validFns = ['search_presets', 'set_component', 'remove_component']
+  if (!validFns.includes(fnName)) return null
+
+  // Parse Python-style keyword args: category="frame", query="5 inch"
+  const args = {}
+  const argPattern = /(\w+)\s*=\s*"([^"]*)"/g
+  let m
+  while ((m = argPattern.exec(argsStr)) !== null) {
+    args[m[1]] = m[2]
+  }
+
+  return {
+    id: `inline_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    function: {
+      name: fnName,
+      arguments: JSON.stringify(args),
+    },
+  }
+}
+
+// Strip tool_code blocks from text shown to user
+function cleanToolCodeFromText(text) {
+  return text
+    .replace(/```(?:tool_code|python)?\s*\n?[\s\S]*?```/g, '')
+    .replace(/(?:print\()?default_api\.\w+\([^)]*\)\)?/g, '')
+    .trim()
+}
+
 export function useAi() {
   const messages = ref([])
   const loading = ref(false)
@@ -179,6 +268,13 @@ export function useAi() {
   }
 
   async function sendMessage(userMessage) {
+    // Handle /help command locally
+    if (userMessage.trim().toLowerCase() === '/help') {
+      messages.value.push({ role: 'user', content: '/help' })
+      messages.value.push({ role: 'assistant', content: HELP_TEXT })
+      return
+    }
+
     const store = useBuildStore()
     const { getSettings } = useStorage()
     const settings = getSettings()
@@ -196,7 +292,11 @@ export function useAi() {
 
 You have tools to search the component database and directly modify the user's build. USE THEM when the user asks you to add, change, or suggest components. Don't just describe components — actually search for them and assign them.
 
+IMPORTANT: Use the provided tool functions directly. Do NOT write code or use print() statements. Just call the functions.
+
 When a user asks to "add a motor" or "set up a 5 inch build", use search_presets to find options, then use set_component to assign the best match (or ask the user to choose if there are multiple good options).
+
+When a user asks to "populate all parts", "build me a fast quad", "set up a cinematic drone", or similar broad requests, you should search and assign ALL relevant components (frame, motors, propellers, battery, FC, ESC, VTX, camera, RX, TX, goggles) using multiple tool calls. Pick components that work well together for the requested style.
 
 You know about:
 - Frame sizes (3", 5", 7") and which components match
@@ -209,24 +309,26 @@ You know about:
 
 Be concise but thorough. If you see compatibility issues, explain WHY they're problems and suggest fixes. Assume the user may be a beginner and explain jargon when used.`
 
-    // Build conversation history for the API (only user/assistant messages)
-    const conversationHistory = messages.value.slice(0, -1)
+    // Build conversation history — keep last 6 messages (≈3 turns) to control cost
+    const recentHistory = messages.value.slice(0, -1)
       .filter(m => m.role === 'user' || m.role === 'assistant')
+      .slice(-6)
       .map(m => ({ role: m.role, content: m.content }))
 
     const apiMessages = [
       { role: 'system', content: systemPrompt },
+      ...recentHistory,
       { role: 'user', content: `Here is my current build state:\n\n${buildContext()}\n\n---\n\nUser question: ${userMessage}` },
-      ...conversationHistory,
     ]
 
-    const MAX_ROUNDS = 5
+    const MAX_ROUNDS = 4
+    let responded = false
 
     try {
       const model = settings.model || 'google/gemini-2.0-flash-001'
 
       for (let round = 0; round < MAX_ROUNDS; round++) {
-        const isLastRound = round === MAX_ROUNDS - 1
+        const isLastRound = round >= MAX_ROUNDS - 2 // last 2 rounds omit tools
 
         const requestBody = {
           model,
@@ -234,7 +336,7 @@ Be concise but thorough. If you see compatibility issues, explain WHY they're pr
           max_tokens: 1024,
         }
 
-        // Include tools unless it's the last round (force text response)
+        // Include tools only in first rounds; omit later to force text
         if (!isLastRound) {
           requestBody.tools = TOOL_DEFINITIONS
         }
@@ -261,10 +363,18 @@ Be concise but thorough. If you see compatibility issues, explain WHY they're pr
 
         if (!msg) throw new Error('No response received.')
 
-        const toolCalls = msg.tool_calls
+        let toolCalls = msg.tool_calls
 
-        // If there are tool calls, execute them and loop
-        if (toolCalls && toolCalls.length > 0) {
+        // Fallback: parse Gemini-style tool_code blocks from text
+        if ((!toolCalls || toolCalls.length === 0) && msg.content) {
+          const inlineCalls = parseInlineToolCalls(msg.content)
+          if (inlineCalls.length > 0) {
+            toolCalls = inlineCalls
+          }
+        }
+
+        // If there are tool calls and we're not on the last round, execute and loop
+        if (toolCalls && toolCalls.length > 0 && round < MAX_ROUNDS - 1) {
           // Push the assistant message with tool_calls into API history
           apiMessages.push({
             role: 'assistant',
@@ -303,10 +413,17 @@ Be concise but thorough. If you see compatibility issues, explain WHY they're pr
           continue
         }
 
-        // No tool calls — just a text response. Done.
-        const reply = msg.content || 'No response received.'
+        // Text response (or last round). Clean any leftover tool_code from display.
+        let reply = msg.content || 'Done.'
+        reply = cleanToolCodeFromText(reply) || reply
         messages.value.push({ role: 'assistant', content: reply })
+        responded = true
         break
+      }
+
+      // Safety: if loop exhausted without a text reply, add fallback
+      if (!responded) {
+        messages.value.push({ role: 'assistant', content: 'Done.' })
       }
     } catch (err) {
       error.value = err.message
@@ -327,5 +444,6 @@ Be concise but thorough. If you see compatibility issues, explain WHY they're pr
     error,
     sendMessage,
     clearChat,
+    HELP_TEXT,
   }
 }

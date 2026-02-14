@@ -179,6 +179,51 @@ export const useBuildStore = defineStore('build', () => {
     }
   }
 
+  function handleAioVtx(fcComponent) {
+    const vtx = components.value.vtx
+    if (fcComponent && fcComponent.specs?.aioVtx) {
+      if (!vtx || vtx._aioVirtual) {
+        components.value.vtx = {
+          id: 'vtx-aio-virtual',
+          name: `Included in ${fcComponent.name}`,
+          description: 'VTX integrated into AIO flight controller',
+          cost: 0, weight: 0, category: 'vtx',
+          _aioVirtual: true,
+          specs: {
+            system: fcComponent.specs.vtxSystem,
+            power: fcComponent.specs.vtxPower,
+            voltage: fcComponent.specs.voltage,
+            connector: fcComponent.specs.vtxConnector,
+          },
+        }
+      }
+    } else {
+      if (vtx?._aioVirtual) components.value.vtx = null
+    }
+  }
+
+  function handleAioRx(fcComponent) {
+    const rx = components.value.rx
+    if (fcComponent && fcComponent.specs?.aioRx) {
+      if (!rx || rx._aioVirtual) {
+        components.value.rx = {
+          id: 'rx-aio-virtual',
+          name: `Included in ${fcComponent.name}`,
+          description: 'SPI receiver integrated into AIO flight controller',
+          cost: 0, weight: 0, category: 'rx',
+          _aioVirtual: true,
+          specs: {
+            protocol: fcComponent.specs.rxProtocol,
+            frequency: fcComponent.specs.rxFrequency,
+            telemetry: true,
+          },
+        }
+      }
+    } else {
+      if (rx?._aioVirtual) components.value.rx = null
+    }
+  }
+
   function setComponent(category, component) {
     pushUndo()
     if (component) {
@@ -186,14 +231,20 @@ export const useBuildStore = defineStore('build', () => {
     } else {
       components.value[category] = null
     }
-    if (category === 'fc') handleAioEsc(components.value.fc)
+    if (category === 'fc') {
+      handleAioEsc(components.value.fc)
+      handleAioVtx(components.value.fc)
+      handleAioRx(components.value.fc)
+    }
   }
 
   function clearComponent(category) {
     pushUndo()
     components.value[category] = null
-    if (category === 'fc') handleAioEsc(null)
+    if (category === 'fc') { handleAioEsc(null); handleAioVtx(null); handleAioRx(null) }
     if (category === 'esc') handleAioEsc(components.value.fc)
+    if (category === 'vtx') handleAioVtx(components.value.fc)
+    if (category === 'rx') handleAioRx(components.value.fc)
   }
 
   function clearAll() {
@@ -209,6 +260,9 @@ export const useBuildStore = defineStore('build', () => {
     Object.keys(components.value).forEach(k => {
       components.value[k] = comps[k] || null
     })
+    handleAioEsc(components.value.fc)
+    handleAioVtx(components.value.fc)
+    handleAioRx(components.value.fc)
   }
 
   function exportBuild() {

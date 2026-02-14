@@ -330,6 +330,38 @@ export const compatibilityRules = [
   },
 
   // ═══════════════════════════════════════════════════
+  // FC ↔ VTX: AIO redundant VTX warning
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'fc-vtx-aio',
+    name: 'AIO FC ↔ Standalone VTX',
+    description: 'This AIO FC includes a built-in VTX. Adding a standalone VTX is usually redundant.',
+    categories: ['fc', 'vtx'],
+    severity: 'warning',
+    check(fc, vtx) {
+      if (fc.specs?.aioVtx && !vtx._aioVirtual)
+        return `Your AIO FC already includes a built-in ${fc.specs.vtxSystem || ''} VTX. The standalone VTX is redundant unless you need more power or a different video system.`
+      return null
+    },
+  },
+
+  // ═══════════════════════════════════════════════════
+  // FC ↔ RX: AIO redundant receiver warning
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'fc-rx-aio',
+    name: 'AIO FC ↔ Standalone Receiver',
+    description: 'This AIO FC includes a built-in SPI receiver. Adding a standalone receiver is usually redundant.',
+    categories: ['fc', 'rx'],
+    severity: 'warning',
+    check(fc, rx) {
+      if (fc.specs?.aioRx && !rx._aioVirtual)
+        return `Your AIO FC already includes a built-in ${fc.specs.rxProtocol || ''} SPI receiver. The standalone receiver is redundant unless you need a different protocol.`
+      return null
+    },
+  },
+
+  // ═══════════════════════════════════════════════════
   // VTX ↔ VTX ANTENNA: Connector type must match
   // ═══════════════════════════════════════════════════
   {
@@ -396,6 +428,8 @@ export const compatibilityExplanations = {
   'battery-frame-size': 'Small frames need small, light batteries. Large frames need powerful batteries for adequate flight time.',
   'motor-esc-current': 'The ESC current rating must exceed the motor\'s peak current draw. Underpowered ESCs can overheat and fail mid-flight.',
   'fc-esc-aio': 'AIO (All-in-One) flight controllers have the ESC built onto the same board. Adding a separate standalone ESC is redundant unless you specifically need higher current capacity than the integrated one provides.',
+  'fc-vtx-aio': 'Some whoop and micro AIO boards have a tiny analog VTX (usually 25mW) built right onto the flight controller board. This is enough for short-range indoor flying. You only need a standalone VTX if you want more power or a different video system like DJI or HDZero.',
+  'fc-rx-aio': 'Some AIO boards include an SPI receiver soldered directly onto the FC board (usually ELRS or FrSky). This saves weight and wiring on tiny whoops. You only need a standalone receiver if you use a different radio protocol than what\'s built in.',
   'vtx-vtxAntenna-connector': 'VTX and its antenna connect via an RF connector. Common types are SMA, RP-SMA, MMCX, and UFL. Mismatched connectors require adapter pigtails that add weight, bulk, and signal loss. SMA↔RP-SMA adapters are simple screw-on and cause minimal loss.',
   'rx-rxAntenna-frequency': 'The receiver antenna must operate on the same frequency band as the receiver. ELRS 2.4GHz receivers need a 2.4GHz antenna, 900MHz receivers need a 900MHz antenna, Crossfire uses 868MHz, etc. Using the wrong frequency band means no signal reception.',
 }

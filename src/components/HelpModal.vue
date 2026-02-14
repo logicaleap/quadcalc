@@ -87,7 +87,7 @@
                 <div><span class="part-name">Motors (x4)</span> — Spin the propellers. Bigger motors = more power. Stator size (like 2306) should match your frame size.</div>
                 <div><span class="part-name">Propellers (x4)</span> — The spinning blades. Must match frame size and motor shaft size.</div>
                 <div><span class="part-name">Battery</span> — Powers everything. "S" count = voltage (4S, 6S). Higher = more power but heavier.</div>
-                <div><span class="part-name">Flight Controller (FC)</span> — The brain. Runs Betaflight software, reads sensors, controls motors.</div>
+                <div><span class="part-name">Flight Controller (FC)</span> — The brain. Runs Betaflight software, reads sensors, controls motors. Some AIO boards also include a built-in VTX and/or SPI receiver.</div>
                 <div><span class="part-name">ESC</span> — Electronic Speed Controller. Sits between the FC and motors, controlling how fast each motor spins.</div>
                 <div><span class="part-name">VTX</span> — Video Transmitter. Sends the camera feed to your goggles wirelessly.</div>
                 <div><span class="part-name">Camera</span> — The FPV camera on the drone. Must match your VTX/goggles system.</div>

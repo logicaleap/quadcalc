@@ -18,7 +18,7 @@ Open `http://localhost:5173` in your browser.
 - **AI Chat** — Ask questions about your build using any OpenRouter-compatible model. The AI sees your current build and can suggest parts or diagnose issues.
 - **Save/Load/Export** — Save builds to localStorage, export as JSON or CSV, import from JSON files.
 - **URL Import** — Paste a product URL from any FPV store and the AI extracts component specs automatically.
-- **265+ Built-in Presets** — Pre-populated database of real FPV components across all 13 categories.
+- **1,000+ Built-in Presets** — Pre-populated database of real FPV components across all 13 categories.
 
 ## Tech Stack
 

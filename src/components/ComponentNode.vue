@@ -34,15 +34,28 @@
       pointer-events="none"
     />
 
-    <!-- Inner icon -->
-    <text
-      text-anchor="middle"
-      dominant-baseline="central"
-      :fill="textColor"
-      font-size="16"
-      y="-1"
+    <!-- Inner icon (Lucide SVG) -->
+    <g
+      :transform="`translate(-12, -13) scale(1)`"
+      fill="none"
+      :stroke="textColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
       pointer-events="none"
-    >{{ category.icon }}</text>
+    >
+      <path v-for="(d, i) in iconData.paths" :key="'p'+i" :d="d" />
+      <circle
+        v-for="(c, i) in iconData.circles || []"
+        :key="'c'+i"
+        :cx="c.cx" :cy="c.cy" :r="c.r"
+      />
+      <rect
+        v-for="(r, i) in iconData.rects || []"
+        :key="'r'+i"
+        :x="r.x" :y="r.y" :width="r.width" :height="r.height" :rx="r.rx || 0"
+      />
+    </g>
 
     <!-- Label -->
     <text
@@ -83,6 +96,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { ICONS } from '../utils/icons.js'
 
 const props = defineProps({
   category: { type: Object, required: true },
@@ -94,6 +108,8 @@ const props = defineProps({
 })
 
 defineEmits(['select'])
+
+const iconData = computed(() => ICONS[props.category.icon] || { paths: [] })
 
 const truncatedName = computed(() => {
   if (!props.component?.name) return ''

@@ -18,19 +18,19 @@ export function generateId() {
 }
 
 export const CATEGORIES = [
-  { key: 'frame', label: 'Frame', icon: '⬡' },
-  { key: 'motors', label: 'Motors', icon: '⚙' },
-  { key: 'propellers', label: 'Propellers', icon: '✦' },
-  { key: 'battery', label: 'Battery', icon: '⚡' },
-  { key: 'fc', label: 'Flight Controller', icon: '◈' },
-  { key: 'esc', label: 'ESC', icon: '△' },
-  { key: 'vtx', label: 'VTX', icon: '◉' },
-  { key: 'camera', label: 'Camera', icon: '◎' },
-  { key: 'rx', label: 'Receiver (RX)', icon: '⟡' },
-  { key: 'tx', label: 'Transmitter (TX)', icon: '⟐' },
-  { key: 'goggles', label: 'Goggles', icon: '◐' },
-  { key: 'antenna', label: 'Antenna', icon: '⦿' },
-  { key: 'other', label: 'Other', icon: '◆' },
+  { key: 'frame', label: 'Frame', icon: 'frame' },
+  { key: 'motors', label: 'Motors', icon: 'motors' },
+  { key: 'propellers', label: 'Propellers', icon: 'propellers' },
+  { key: 'battery', label: 'Battery', icon: 'battery' },
+  { key: 'fc', label: 'Flight Controller', icon: 'fc' },
+  { key: 'esc', label: 'ESC', icon: 'esc' },
+  { key: 'vtx', label: 'VTX', icon: 'vtx' },
+  { key: 'camera', label: 'Camera', icon: 'camera' },
+  { key: 'rx', label: 'Receiver (RX)', icon: 'rx' },
+  { key: 'tx', label: 'Transmitter (TX)', icon: 'tx' },
+  { key: 'goggles', label: 'Goggles', icon: 'goggles' },
+  { key: 'antenna', label: 'Antenna', icon: 'antenna' },
+  { key: 'other', label: 'Other', icon: 'other' },
 ]
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.key, c]))

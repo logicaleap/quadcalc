@@ -3,7 +3,11 @@
     <div v-if="store.selectedCategory" class="component-panel tron-panel animate-fade-in">
       <div class="panel-header">
         <div class="flex items-center gap-2">
-          <span class="text-lg">{{ currentCat?.icon }}</span>
+          <svg v-if="currentIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-tron-cyan">
+            <path v-for="(d, i) in currentIcon.paths" :key="'p'+i" :d="d" />
+            <circle v-for="(c, i) in currentIcon.circles || []" :key="'c'+i" :cx="c.cx" :cy="c.cy" :r="c.r" />
+            <rect v-for="(r, i) in currentIcon.rects || []" :key="'r'+i" :x="r.x" :y="r.y" :width="r.width" :height="r.height" :rx="r.rx || 0" />
+          </svg>
           <h3 class="text-tron-cyan text-sm font-bold tracking-wider uppercase">
             {{ currentCat?.label }}
           </h3>
@@ -87,6 +91,7 @@ import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
 import { useStorage } from '../composables/useStorage.js'
 import { CATEGORY_MAP, formatCurrency, formatWeight } from '../utils/helpers.js'
+import { ICONS } from '../utils/icons.js'
 import { presets } from '../data/presets.js'
 import ComponentSelector from './ComponentSelector.vue'
 
@@ -97,6 +102,10 @@ const { getCustomPresets } = useStorage()
 const currentCat = computed(() => {
   if (!store.selectedCategory) return null
   return CATEGORY_MAP[store.selectedCategory]
+})
+
+const currentIcon = computed(() => {
+  return currentCat.value ? ICONS[currentCat.value.icon] : null
 })
 
 const currentComponent = computed(() => {

@@ -137,6 +137,17 @@
             </section>
 
             <section>
+              <h4>Pricing & Weight Assumptions</h4>
+              <ul>
+                <li>All prices are in <strong>USD</strong> and are approximate/reference only — check your vendor for current pricing.</li>
+                <li><strong>Motor cost is multiplied by 4</strong> — presets list per-unit pricing since you buy 4 individual motors.</li>
+                <li><strong>Motor and propeller weight is multiplied by 4</strong> — the build total reflects all four.</li>
+                <li><strong>Propeller cost is NOT multiplied</strong> — props are typically sold in packs of 4.</li>
+                <li>All other components are counted once.</li>
+              </ul>
+            </section>
+
+            <section>
               <h4>Beginner Build Recommendations</h4>
               <p>If you're just starting out, here's a rough guide:</p>
               <ul>

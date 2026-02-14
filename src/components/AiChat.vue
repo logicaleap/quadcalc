@@ -32,8 +32,16 @@
             class="message"
             :class="msg.role"
           >
-            <div class="msg-label">{{ msg.role === 'user' ? 'YOU' : 'AI' }}</div>
-            <div class="msg-content" v-html="renderMarkdown(msg.content)"></div>
+            <template v-if="msg.role === 'action'">
+              <div class="action-content">
+                <span class="action-icon" :class="msg.actionType">{{ msg.actionType === 'set' ? '\u2713' : '\u2717' }}</span>
+                <span>{{ msg.content }}</span>
+              </div>
+            </template>
+            <template v-else>
+              <div class="msg-label">{{ msg.role === 'user' ? 'YOU' : 'AI' }}</div>
+              <div class="msg-content" v-html="renderMarkdown(msg.content)"></div>
+            </template>
           </div>
 
           <div v-if="loading" class="message assistant">
@@ -163,6 +171,30 @@ watch(messages, () => {
 .message.assistant {
   background: rgba(0, 255, 136, 0.03);
   border-left: 2px solid rgba(0, 255, 136, 0.2);
+}
+
+.message.action {
+  background: rgba(0, 255, 136, 0.06);
+  border-left: 2px solid rgba(0, 255, 136, 0.4);
+  padding: 4px 8px;
+}
+.action-content {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  color: var(--color-tron-green);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.action-icon {
+  font-weight: 700;
+  font-size: 13px;
+}
+.action-icon.set {
+  color: var(--color-tron-green);
+}
+.action-icon.remove {
+  color: var(--color-tron-red);
 }
 
 .msg-label {

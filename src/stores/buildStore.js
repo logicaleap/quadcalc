@@ -18,7 +18,11 @@ export const useBuildStore = defineStore('build', () => {
   )
 
   const totalCost = computed(() =>
-    Object.values(components.value).reduce((sum, c) => sum + (c?.cost || 0), 0)
+    Object.values(components.value).reduce((sum, c) => {
+      if (!c?.cost) return sum
+      if (c.category === 'motors') return sum + c.cost * 4
+      return sum + c.cost
+    }, 0)
   )
 
   const totalWeight = computed(() =>

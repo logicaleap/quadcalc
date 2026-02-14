@@ -39,7 +39,7 @@
     <AiChat />
 
     <!-- Credits -->
-    <div class="credits">Built by Asaf Shamir</div>
+    <a href="mailto:contact@shamir.com.au" class="credits">Built by Asaf Shamir · contact@shamir.com.au</a>
 
     <!-- Modals -->
     <SaveLoadModal :show="showSaveLoad" @close="showSaveLoad = false" />
@@ -114,6 +114,11 @@ const showHelp = ref(false)
   font-family: 'Share Tech Mono', monospace;
   letter-spacing: 0.5px;
   z-index: 10;
-  pointer-events: none;
+  pointer-events: auto;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.credits:hover {
+  color: rgba(0, 240, 255, 0.6);
 }
 </style>

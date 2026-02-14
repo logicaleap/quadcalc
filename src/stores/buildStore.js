@@ -179,6 +179,7 @@ export const useBuildStore = defineStore('build', () => {
     pushUndo()
     components.value[category] = null
     if (category === 'fc') handleAioEsc(null)
+    if (category === 'esc') handleAioEsc(components.value.fc)
   }
 
   function clearAll() {

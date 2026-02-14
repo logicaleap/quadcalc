@@ -173,7 +173,7 @@ defineEmits(['close'])
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--qc-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,7 +200,7 @@ defineEmits(['close'])
   color: var(--color-tron-cyan);
   margin-bottom: 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  border-bottom: 1px solid var(--qc-cyan-01);
 }
 
 .help-content p {
@@ -237,7 +237,7 @@ defineEmits(['close'])
   line-height: 1.5;
   color: var(--color-tron-text);
   padding: 4px 0;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.05);
+  border-bottom: 1px solid var(--qc-cyan-005);
 }
 
 .part-name {

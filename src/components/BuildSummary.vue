@@ -161,7 +161,7 @@ const breakdownSegments = computed(() => {
 .build-name-input {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.15);
+  border-bottom: 1px solid var(--qc-cyan-015);
   color: var(--color-tron-text-bright);
   font-family: 'Orbitron', sans-serif;
   font-size: 12px;
@@ -177,7 +177,7 @@ const breakdownSegments = computed(() => {
   border-color: var(--color-tron-cyan);
 }
 .build-name-input::placeholder {
-  color: rgba(197, 208, 224, 0.3);
+  color: var(--qc-text-muted);
 }
 
 .stat-block {
@@ -199,7 +199,7 @@ const breakdownSegments = computed(() => {
 .stat-label {
   font-size: 9px;
   font-family: 'Share Tech Mono', monospace;
-  color: rgba(197, 208, 224, 0.3);
+  color: var(--qc-text-muted);
   letter-spacing: 1px;
 }
 
@@ -258,7 +258,7 @@ const breakdownSegments = computed(() => {
   gap: 3px;
   font-size: 9px;
   font-family: 'Share Tech Mono', monospace;
-  color: rgba(197, 208, 224, 0.5);
+  color: var(--qc-text-muted);
 }
 
 .legend-dot {

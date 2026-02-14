@@ -243,7 +243,7 @@ function countComponents(build) {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--qc-overlay);
   display: flex;
   align-items: center;
   justify-content: center;

@@ -79,9 +79,11 @@
 <script setup>
 import { ref, nextTick, watch, computed, inject } from 'vue'
 import { useAi } from '../composables/useAi.js'
+import { useTheme } from '../composables/useTheme.js'
 
 const { messages, loading, error, needsApiKey, sendMessage, clearChat } = useAi()
 const openSettings = inject('openSettings', null)
+const { isDark } = useTheme()
 
 watch(needsApiKey, (val) => {
   if (val) {
@@ -129,12 +131,13 @@ function scrollToBottom() {
 }
 
 function renderMarkdown(text) {
+  const codeBg = isDark.value ? 'rgba(0,240,255,0.08)' : 'rgba(8,145,178,0.08)'
   return text
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`(.+?)`/g, '<code style="background:rgba(0,240,255,0.08);padding:1px 4px;font-size:11px;">$1</code>')
+    .replace(/`(.+?)`/g, `<code style="background:${codeBg};padding:1px 4px;font-size:11px;">$1</code>`)
     .replace(/\n/g, '<br>')
 }
 
@@ -165,9 +168,9 @@ watch(messages, () => {
   font-weight: 700;
 }
 .ai-toggle.active {
-  background: rgba(0, 240, 255, 0.15);
-  border-color: var(--color-tron-cyan);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  background: var(--qc-cyan-015);
+  border-color: var(--qc-cyan);
+  box-shadow: var(--qc-glow-cyan);
 }
 
 .ai-panel {
@@ -208,7 +211,7 @@ watch(messages, () => {
   align-items: center;
   justify-content: space-between;
   padding: 10px 12px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  border-bottom: 1px solid var(--qc-cyan-01);
   flex-shrink: 0;
 }
 
@@ -230,23 +233,23 @@ watch(messages, () => {
   padding: 6px 8px;
 }
 .message.user {
-  background: rgba(0, 240, 255, 0.05);
-  border-left: 2px solid rgba(0, 240, 255, 0.3);
+  background: var(--qc-cyan-005);
+  border-left: 2px solid var(--qc-cyan-03);
 }
 .message.assistant {
-  background: rgba(0, 255, 136, 0.03);
-  border-left: 2px solid rgba(0, 255, 136, 0.2);
+  background: var(--qc-green-003);
+  border-left: 2px solid var(--qc-green-02);
 }
 
 .message.action {
-  background: rgba(0, 255, 136, 0.06);
-  border-left: 2px solid rgba(0, 255, 136, 0.4);
+  background: var(--qc-green-006);
+  border-left: 2px solid var(--qc-green-04);
   padding: 4px 8px;
 }
 .action-content {
   font-family: 'Share Tech Mono', monospace;
   font-size: 11px;
-  color: var(--color-tron-green);
+  color: var(--qc-green);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -256,30 +259,30 @@ watch(messages, () => {
   font-size: 13px;
 }
 .action-icon.set {
-  color: var(--color-tron-green);
+  color: var(--qc-green);
 }
 .action-icon.remove {
-  color: var(--color-tron-red);
+  color: var(--qc-red);
 }
 
 .msg-label {
   font-size: 9px;
   font-family: 'Share Tech Mono', monospace;
-  color: rgba(197, 208, 224, 0.3);
+  color: var(--qc-text-muted);
   letter-spacing: 1px;
   margin-bottom: 2px;
 }
 .msg-content {
   font-size: 12px;
   line-height: 1.5;
-  color: var(--color-tron-text);
+  color: var(--qc-text);
 }
 
 .chat-input-row {
   display: flex;
   gap: 6px;
   padding: 8px;
-  border-top: 1px solid rgba(0, 240, 255, 0.1);
+  border-top: 1px solid var(--qc-cyan-01);
   flex-shrink: 0;
 }
 

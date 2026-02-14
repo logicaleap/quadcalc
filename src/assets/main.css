@@ -18,6 +18,193 @@
   --font-mono: 'Share Tech Mono', monospace;
 }
 
+/* ============================================================
+   CSS Custom Properties — dark defaults (the "tron" aesthetic)
+   ============================================================ */
+:root {
+  /* Backgrounds */
+  --qc-bg: #0a0e14;
+  --qc-surface: rgba(13, 17, 23, 0.9);
+  --qc-surface-solid: #0d1117;
+  --qc-surface-hover: rgba(13, 17, 23, 0.95);
+
+  /* Text */
+  --qc-text: #c5d0e0;
+  --qc-text-bright: #e8edf5;
+  --qc-text-muted: rgba(197, 208, 224, 0.3);
+  --qc-text-faint: rgba(197, 208, 224, 0.25);
+
+  /* Accent colors */
+  --qc-cyan: #00f0ff;
+  --qc-red: #ff003c;
+  --qc-green: #00ff88;
+  --qc-yellow: #ffb800;
+  --qc-blue: #3d5afe;
+
+  /* Accent alphas — used for bg tints, borders, etc. */
+  --qc-cyan-005: rgba(0, 240, 255, 0.05);
+  --qc-cyan-008: rgba(0, 240, 255, 0.08);
+  --qc-cyan-01: rgba(0, 240, 255, 0.1);
+  --qc-cyan-015: rgba(0, 240, 255, 0.15);
+  --qc-cyan-02: rgba(0, 240, 255, 0.2);
+  --qc-cyan-03: rgba(0, 240, 255, 0.3);
+  --qc-cyan-05: rgba(0, 240, 255, 0.5);
+
+  --qc-red-004: rgba(255, 0, 60, 0.04);
+  --qc-red-008: rgba(255, 0, 60, 0.08);
+  --qc-red-015: rgba(255, 0, 60, 0.15);
+  --qc-red-02: rgba(255, 0, 60, 0.2);
+  --qc-red-03: rgba(255, 0, 60, 0.3);
+
+  --qc-green-003: rgba(0, 255, 136, 0.03);
+  --qc-green-006: rgba(0, 255, 136, 0.06);
+  --qc-green-008: rgba(0, 255, 136, 0.08);
+  --qc-green-015: rgba(0, 255, 136, 0.15);
+  --qc-green-02: rgba(0, 255, 136, 0.2);
+  --qc-green-03: rgba(0, 255, 136, 0.3);
+  --qc-green-04: rgba(0, 255, 136, 0.4);
+
+  --qc-yellow-004: rgba(255, 184, 0, 0.04);
+  --qc-yellow-008: rgba(255, 184, 0, 0.08);
+  --qc-yellow-015: rgba(255, 184, 0, 0.15);
+
+  --qc-blue-004: rgba(61, 90, 254, 0.04);
+  --qc-blue-015: rgba(61, 90, 254, 0.15);
+  --qc-blue-025: rgba(61, 90, 254, 0.25);
+
+  /* Glow effects */
+  --qc-glow-cyan: 0 0 8px rgba(0, 240, 255, 0.3), 0 0 20px rgba(0, 240, 255, 0.1);
+  --qc-glow-cyan-strong: 0 0 12px rgba(0, 240, 255, 0.5), 0 0 30px rgba(0, 240, 255, 0.2);
+  --qc-glow-green: 0 0 8px rgba(0, 255, 136, 0.3), 0 0 20px rgba(0, 255, 136, 0.1);
+  --qc-glow-red: 0 0 8px rgba(255, 0, 60, 0.3), 0 0 20px rgba(255, 0, 60, 0.1);
+  --qc-glow-text-cyan: 0 0 8px rgba(0, 240, 255, 0.5);
+  --qc-glow-text-green: 0 0 8px rgba(0, 255, 136, 0.5);
+  --qc-glow-text-red: 0 0 8px rgba(255, 0, 60, 0.5);
+
+  /* Input */
+  --qc-input-bg: rgba(10, 14, 20, 0.8);
+
+  /* Overlay */
+  --qc-overlay: rgba(0, 0, 0, 0.7);
+
+  /* Scrollbar */
+  --qc-scrollbar-track: #0a0e14;
+  --qc-scrollbar-thumb: #2a3040;
+
+  /* Alert text colors */
+  --qc-alert-error-text: #ffa0b4;
+  --qc-alert-warning-text: #ffe0a0;
+  --qc-alert-info-text: rgba(197, 208, 224, 0.7);
+
+  /* Select option bg */
+  --qc-select-bg: #0d1117;
+  --qc-select-text: #c5d0e0;
+
+  /* Misc */
+  --qc-note-color: rgba(255, 200, 50, 0.4);
+}
+
+/* ============================================================
+   Light theme overrides
+   ============================================================ */
+.light-theme {
+  /* Backgrounds */
+  --qc-bg: #f5f7fa;
+  --qc-surface: rgba(255, 255, 255, 0.95);
+  --qc-surface-solid: #ffffff;
+  --qc-surface-hover: rgba(255, 255, 255, 0.98);
+
+  /* Text */
+  --qc-text: #4a5568;
+  --qc-text-bright: #1a202c;
+  --qc-text-muted: rgba(74, 85, 104, 0.4);
+  --qc-text-faint: rgba(74, 85, 104, 0.25);
+
+  /* Accent colors */
+  --qc-cyan: #0891b2;
+  --qc-red: #dc2626;
+  --qc-green: #059669;
+  --qc-yellow: #d97706;
+  --qc-blue: #3b82f6;
+
+  /* Accent alphas */
+  --qc-cyan-005: rgba(8, 145, 178, 0.05);
+  --qc-cyan-008: rgba(8, 145, 178, 0.08);
+  --qc-cyan-01: rgba(8, 145, 178, 0.1);
+  --qc-cyan-015: rgba(8, 145, 178, 0.15);
+  --qc-cyan-02: rgba(8, 145, 178, 0.2);
+  --qc-cyan-03: rgba(8, 145, 178, 0.3);
+  --qc-cyan-05: rgba(8, 145, 178, 0.5);
+
+  --qc-red-004: rgba(220, 38, 38, 0.04);
+  --qc-red-008: rgba(220, 38, 38, 0.08);
+  --qc-red-015: rgba(220, 38, 38, 0.15);
+  --qc-red-02: rgba(220, 38, 38, 0.2);
+  --qc-red-03: rgba(220, 38, 38, 0.3);
+
+  --qc-green-003: rgba(5, 150, 105, 0.03);
+  --qc-green-006: rgba(5, 150, 105, 0.06);
+  --qc-green-008: rgba(5, 150, 105, 0.08);
+  --qc-green-015: rgba(5, 150, 105, 0.15);
+  --qc-green-02: rgba(5, 150, 105, 0.2);
+  --qc-green-03: rgba(5, 150, 105, 0.3);
+  --qc-green-04: rgba(5, 150, 105, 0.4);
+
+  --qc-yellow-004: rgba(217, 119, 6, 0.04);
+  --qc-yellow-008: rgba(217, 119, 6, 0.08);
+  --qc-yellow-015: rgba(217, 119, 6, 0.15);
+
+  --qc-blue-004: rgba(59, 130, 246, 0.04);
+  --qc-blue-015: rgba(59, 130, 246, 0.15);
+  --qc-blue-025: rgba(59, 130, 246, 0.25);
+
+  /* Glow effects → subtle box-shadows */
+  --qc-glow-cyan: 0 1px 4px rgba(8, 145, 178, 0.15), 0 0 1px rgba(8, 145, 178, 0.1);
+  --qc-glow-cyan-strong: 0 2px 8px rgba(8, 145, 178, 0.2), 0 0 2px rgba(8, 145, 178, 0.15);
+  --qc-glow-green: 0 1px 4px rgba(5, 150, 105, 0.15), 0 0 1px rgba(5, 150, 105, 0.1);
+  --qc-glow-red: 0 1px 4px rgba(220, 38, 38, 0.15), 0 0 1px rgba(220, 38, 38, 0.1);
+  --qc-glow-text-cyan: none;
+  --qc-glow-text-green: none;
+  --qc-glow-text-red: none;
+
+  /* Input */
+  --qc-input-bg: rgba(255, 255, 255, 0.9);
+
+  /* Overlay */
+  --qc-overlay: rgba(0, 0, 0, 0.3);
+
+  /* Scrollbar */
+  --qc-scrollbar-track: #f0f2f5;
+  --qc-scrollbar-thumb: #cbd5e0;
+
+  /* Alert text colors */
+  --qc-alert-error-text: #dc2626;
+  --qc-alert-warning-text: #d97706;
+  --qc-alert-info-text: #4a5568;
+
+  /* Select option bg */
+  --qc-select-bg: #ffffff;
+  --qc-select-text: #4a5568;
+
+  /* Misc */
+  --qc-note-color: rgba(180, 140, 20, 0.5);
+}
+
+/* Also update Tailwind theme colors for light mode so utility classes adapt */
+.light-theme {
+  --color-tron-bg: #f5f7fa;
+  --color-tron-surface: #ffffff;
+  --color-tron-surface-light: #f0f2f5;
+  --color-tron-cyan: #0891b2;
+  --color-tron-blue: #3b82f6;
+  --color-tron-red: #dc2626;
+  --color-tron-green: #059669;
+  --color-tron-yellow: #d97706;
+  --color-tron-muted: #e2e8f0;
+  --color-tron-text: #4a5568;
+  --color-tron-text-bright: #1a202c;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -39,8 +226,8 @@ html, body, #app {
 }
 
 body {
-  background: var(--color-tron-bg);
-  color: var(--color-tron-text);
+  background: var(--qc-bg);
+  color: var(--qc-text);
   font-family: var(--font-rajdhani);
 }
 
@@ -52,55 +239,55 @@ h1, h2, h3, h4, h5, h6 {
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-tron-bg);
+  background: var(--qc-scrollbar-track);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-tron-muted);
+  background: var(--qc-scrollbar-thumb);
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-tron-cyan);
+  background: var(--qc-cyan);
 }
 
 .glow-cyan {
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.3), 0 0 20px rgba(0, 240, 255, 0.1);
+  box-shadow: var(--qc-glow-cyan);
 }
 .glow-cyan-strong {
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5), 0 0 30px rgba(0, 240, 255, 0.2);
+  box-shadow: var(--qc-glow-cyan-strong);
 }
 .glow-green {
-  box-shadow: 0 0 8px rgba(0, 255, 136, 0.3), 0 0 20px rgba(0, 255, 136, 0.1);
+  box-shadow: var(--qc-glow-green);
 }
 .glow-red {
-  box-shadow: 0 0 8px rgba(255, 0, 60, 0.3), 0 0 20px rgba(255, 0, 60, 0.1);
+  box-shadow: var(--qc-glow-red);
 }
 .glow-text-cyan {
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+  text-shadow: var(--qc-glow-text-cyan);
 }
 .glow-text-green {
-  text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+  text-shadow: var(--qc-glow-text-green);
 }
 .glow-text-red {
-  text-shadow: 0 0 8px rgba(255, 0, 60, 0.5);
+  text-shadow: var(--qc-glow-text-red);
 }
 
 .tron-border {
-  border: 1px solid rgba(0, 240, 255, 0.2);
+  border: 1px solid var(--qc-cyan-02);
 }
 .tron-border-bright {
-  border: 1px solid rgba(0, 240, 255, 0.5);
+  border: 1px solid var(--qc-cyan-05);
 }
 
 .tron-panel {
-  background: rgba(13, 17, 23, 0.9);
-  border: 1px solid rgba(0, 240, 255, 0.15);
+  background: var(--qc-surface);
+  border: 1px solid var(--qc-cyan-015);
   backdrop-filter: blur(10px);
 }
 
 .tron-btn {
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  color: var(--color-tron-cyan);
+  background: var(--qc-cyan-008);
+  border: 1px solid var(--qc-cyan-03);
+  color: var(--qc-cyan);
   font-family: var(--font-rajdhani);
   font-weight: 600;
   padding: 0.4rem 1rem;
@@ -108,48 +295,48 @@ h1, h2, h3, h4, h5, h6 {
   transition: all 0.2s;
 }
 .tron-btn:hover {
-  background: rgba(0, 240, 255, 0.15);
-  border-color: var(--color-tron-cyan);
-  box-shadow: 0 0 12px rgba(0, 240, 255, 0.3);
+  background: var(--qc-cyan-015);
+  border-color: var(--qc-cyan);
+  box-shadow: var(--qc-glow-cyan);
 }
 
 .tron-btn-danger {
-  background: rgba(255, 0, 60, 0.08);
-  border-color: rgba(255, 0, 60, 0.3);
-  color: var(--color-tron-red);
+  background: var(--qc-red-008);
+  border-color: var(--qc-red-03);
+  color: var(--qc-red);
 }
 .tron-btn-danger:hover {
-  background: rgba(255, 0, 60, 0.15);
-  border-color: var(--color-tron-red);
-  box-shadow: 0 0 12px rgba(255, 0, 60, 0.3);
+  background: var(--qc-red-015);
+  border-color: var(--qc-red);
+  box-shadow: var(--qc-glow-red);
 }
 
 .tron-btn-success {
-  background: rgba(0, 255, 136, 0.08);
-  border-color: rgba(0, 255, 136, 0.3);
-  color: var(--color-tron-green);
+  background: var(--qc-green-008);
+  border-color: var(--qc-green-03);
+  color: var(--qc-green);
 }
 .tron-btn-success:hover {
-  background: rgba(0, 255, 136, 0.15);
-  border-color: var(--color-tron-green);
-  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+  background: var(--qc-green-015);
+  border-color: var(--qc-green);
+  box-shadow: var(--qc-glow-green);
 }
 
 .tron-input {
-  background: rgba(10, 14, 20, 0.8);
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  color: var(--color-tron-text-bright);
+  background: var(--qc-input-bg);
+  border: 1px solid var(--qc-cyan-02);
+  color: var(--qc-text-bright);
   font-family: var(--font-rajdhani);
   padding: 0.4rem 0.75rem;
   outline: none;
   transition: border-color 0.2s;
 }
 .tron-input:focus {
-  border-color: var(--color-tron-cyan);
-  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+  border-color: var(--qc-cyan);
+  box-shadow: var(--qc-glow-cyan);
 }
 .tron-input::placeholder {
-  color: rgba(197, 208, 224, 0.3);
+  color: var(--qc-text-muted);
 }
 
 @keyframes pulse-glow {

@@ -204,7 +204,7 @@ function clearSlot() {
   justify-content: space-between;
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  border-bottom: 1px solid var(--qc-cyan-01);
   flex-shrink: 0;
 }
 
@@ -212,19 +212,19 @@ function clearSlot() {
   display: flex;
   flex-direction: column;
   padding: 4px 8px;
-  background: rgba(0, 240, 255, 0.03);
-  border: 1px solid rgba(0, 240, 255, 0.08);
+  background: var(--qc-cyan-005);
+  border: 1px solid var(--qc-cyan-008);
 }
 .spec-chip .label {
   font-size: 9px;
   text-transform: uppercase;
-  color: rgba(0, 240, 255, 0.5);
+  color: var(--qc-cyan-05);
   font-family: 'Share Tech Mono', monospace;
   letter-spacing: 0.5px;
 }
 .spec-chip .value {
   font-size: 12px;
-  color: var(--color-tron-text-bright);
+  color: var(--qc-text-bright);
   font-family: 'Rajdhani', sans-serif;
   font-weight: 600;
 }
@@ -242,8 +242,8 @@ function clearSlot() {
 .toggle-track {
   width: 28px;
   height: 14px;
-  background: rgba(0, 240, 255, 0.1);
-  border: 1px solid rgba(0, 240, 255, 0.2);
+  background: var(--qc-cyan-01);
+  border: 1px solid var(--qc-cyan-02);
   border-radius: 7px;
   position: relative;
   transition: all 0.2s;
@@ -254,26 +254,26 @@ function clearSlot() {
   left: 1px;
   width: 10px;
   height: 10px;
-  background: rgba(197, 208, 224, 0.4);
+  background: var(--qc-text-muted);
   border-radius: 50%;
   transition: all 0.2s;
 }
 .compat-toggle input:checked + .toggle-track {
-  background: rgba(0, 240, 255, 0.2);
-  border-color: var(--color-tron-cyan);
+  background: var(--qc-cyan-02);
+  border-color: var(--qc-cyan);
 }
 .compat-toggle input:checked + .toggle-track .toggle-thumb {
   left: 15px;
-  background: var(--color-tron-cyan);
+  background: var(--qc-cyan);
 }
 .toggle-label {
   font-size: 9px;
   font-family: 'Share Tech Mono', monospace;
-  color: rgba(197, 208, 224, 0.4);
+  color: var(--qc-text-muted);
   letter-spacing: 0.3px;
 }
 .compat-toggle input:checked ~ .toggle-label {
-  color: var(--color-tron-cyan);
+  color: var(--qc-cyan);
 }
 
 .mobile-panel {
@@ -285,14 +285,14 @@ function clearSlot() {
   width: 100%;
   height: 65vh;
   border-radius: 12px 12px 0 0;
-  border-top: 2px solid rgba(0, 240, 255, 0.3);
+  border-top: 2px solid var(--qc-cyan-03);
 }
 .mobile-panel::before {
   content: '';
   display: block;
   width: 40px;
   height: 4px;
-  background: rgba(0, 240, 255, 0.3);
+  background: var(--qc-cyan-03);
   border-radius: 2px;
   margin: 0 auto 8px;
 }

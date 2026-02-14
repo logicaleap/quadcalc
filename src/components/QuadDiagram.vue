@@ -18,33 +18,33 @@
       <!-- Center quad body illustration -->
       <g filter="url(#glow)" pointer-events="none">
         <!-- Arms -->
-        <line x1="-30" y1="-30" x2="-65" y2="-65" stroke="#00f0ff" stroke-width="2.5" opacity="0.7" />
-        <line x1="30" y1="-30" x2="65" y2="-65" stroke="#00f0ff" stroke-width="2.5" opacity="0.7" />
-        <line x1="-30" y1="30" x2="-65" y2="65" stroke="#00f0ff" stroke-width="2.5" opacity="0.7" />
-        <line x1="30" y1="30" x2="65" y2="65" stroke="#00f0ff" stroke-width="2.5" opacity="0.7" />
+        <line x1="-30" y1="-30" x2="-65" y2="-65" :stroke="accentColor" stroke-width="2.5" opacity="0.7" />
+        <line x1="30" y1="-30" x2="65" y2="-65" :stroke="accentColor" stroke-width="2.5" opacity="0.7" />
+        <line x1="-30" y1="30" x2="-65" y2="65" :stroke="accentColor" stroke-width="2.5" opacity="0.7" />
+        <line x1="30" y1="30" x2="65" y2="65" :stroke="accentColor" stroke-width="2.5" opacity="0.7" />
 
         <!-- Motors (circles at arm ends) -->
-        <circle cx="-65" cy="-65" r="14" fill="none" stroke="#00f0ff" stroke-width="1.5" opacity="0.5" />
-        <circle cx="65" cy="-65" r="14" fill="none" stroke="#00f0ff" stroke-width="1.5" opacity="0.5" />
-        <circle cx="-65" cy="65" r="14" fill="none" stroke="#00f0ff" stroke-width="1.5" opacity="0.5" />
-        <circle cx="65" cy="65" r="14" fill="none" stroke="#00f0ff" stroke-width="1.5" opacity="0.5" />
+        <circle cx="-65" cy="-65" r="14" fill="none" :stroke="accentColor" stroke-width="1.5" opacity="0.5" />
+        <circle cx="65" cy="-65" r="14" fill="none" :stroke="accentColor" stroke-width="1.5" opacity="0.5" />
+        <circle cx="-65" cy="65" r="14" fill="none" :stroke="accentColor" stroke-width="1.5" opacity="0.5" />
+        <circle cx="65" cy="65" r="14" fill="none" :stroke="accentColor" stroke-width="1.5" opacity="0.5" />
 
         <!-- Prop arcs -->
-        <circle cx="-65" cy="-65" r="22" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
-        <circle cx="65" cy="-65" r="22" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
-        <circle cx="-65" cy="65" r="22" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
-        <circle cx="65" cy="65" r="22" fill="none" stroke="#00f0ff" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
+        <circle cx="-65" cy="-65" r="22" fill="none" :stroke="accentColor" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
+        <circle cx="65" cy="-65" r="22" fill="none" :stroke="accentColor" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
+        <circle cx="-65" cy="65" r="22" fill="none" :stroke="accentColor" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
+        <circle cx="65" cy="65" r="22" fill="none" :stroke="accentColor" stroke-width="0.5" opacity="0.25" stroke-dasharray="3 5" />
 
         <!-- Center body -->
         <rect x="-30" y="-30" width="60" height="60" rx="6"
-          fill="rgba(0,240,255,0.04)" stroke="#00f0ff" stroke-width="1.5" opacity="0.6" />
+          :fill="bodyFill" :stroke="accentColor" stroke-width="1.5" opacity="0.6" />
 
         <!-- FC board hint -->
         <rect x="-16" y="-16" width="32" height="32" rx="2"
-          fill="none" stroke="#00f0ff" stroke-width="0.8" opacity="0.3" stroke-dasharray="2 2" />
+          fill="none" :stroke="accentColor" stroke-width="0.8" opacity="0.3" stroke-dasharray="2 2" />
 
         <!-- Camera direction arrow -->
-        <polygon points="0,-38 -6,-30 6,-30" fill="#00f0ff" opacity="0.4" />
+        <polygon points="0,-38 -6,-30 6,-30" :fill="accentColor" opacity="0.4" />
       </g>
 
       <!-- Component nodes -->
@@ -67,17 +67,22 @@
 import { computed, ref, inject } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
+import { useTheme } from '../composables/useTheme.js'
 import { CATEGORIES } from '../utils/helpers.js'
 import ComponentNode from './ComponentNode.vue'
 
 const store = useBuildStore()
 const { getCategoryStatus } = useCompatibility()
+const { isDark } = useTheme()
 const wrapperRef = ref(null)
 const isMobile = inject('isMobile', ref(false))
 
 const categories = CATEGORIES
 const svgSize = computed(() => isMobile.value ? 500 : 700)
 const svgHalf = computed(() => svgSize.value / 2)
+
+const accentColor = computed(() => isDark.value ? '#00f0ff' : '#0891b2')
+const bodyFill = computed(() => isDark.value ? 'rgba(0,240,255,0.04)' : 'rgba(8,145,178,0.06)')
 
 const nodePositions = computed(() => {
   const radius = isMobile.value ? 170 : 240

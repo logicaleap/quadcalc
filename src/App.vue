@@ -12,6 +12,14 @@
         <span class="text-tron-text/20 text-xs font-mono hidden sm:inline">FPV BUILD PLANNER</span>
       </div>
       <div class="flex items-center gap-2">
+        <button class="theme-toggle tron-btn text-xs" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+          <svg v-if="isDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
         <button class="tron-btn text-xs" @click="showUrlImport = true">IMPORT URL</button>
         <button class="tron-btn text-xs" @click="showSaveLoad = true">BUILDS</button>
         <button class="tron-btn text-xs" @click="showSettings = true">SETTINGS</button>
@@ -54,6 +62,7 @@
 import { ref, provide, onMounted, onUnmounted } from 'vue'
 import { useBuildStore } from './stores/buildStore.js'
 import { useStorage } from './composables/useStorage.js'
+import { useTheme } from './composables/useTheme.js'
 import TronGrid from './components/TronGrid.vue'
 import QuadDiagram from './components/QuadDiagram.vue'
 import ComponentPanel from './components/ComponentPanel.vue'
@@ -67,8 +76,10 @@ import HelpModal from './components/HelpModal.vue'
 
 const store = useBuildStore()
 const { loadBuildFromUrl } = useStorage()
+const { isDark, initTheme, toggleTheme } = useTheme()
 
 onMounted(() => {
+  initTheme()
   if (window.location.hash.includes('#build=')) {
     const loaded = loadBuildFromUrl(window.location.hash)
     if (loaded) history.replaceState(null, '', window.location.pathname)
@@ -108,8 +119,8 @@ provide('openSettings', () => { showSettings.value = true })
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  background: rgba(10, 14, 20, 0.85);
-  border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  background: var(--qc-surface);
+  border-bottom: 1px solid var(--qc-cyan-01);
   backdrop-filter: blur(8px);
 }
 
@@ -129,9 +140,16 @@ provide('openSettings', () => { showSettings.value = true })
   display: block;
   font-size: 9px;
   font-family: 'Share Tech Mono', monospace;
-  color: rgba(255, 200, 50, 0.4);
+  color: var(--qc-note-color);
   letter-spacing: 0.5px;
   margin-top: 1px;
+}
+
+.theme-toggle {
+  padding: 0.4rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bottom-info {
@@ -147,7 +165,7 @@ provide('openSettings', () => { showSettings.value = true })
 }
 .credits {
   font-size: 11px;
-  color: rgba(0, 240, 255, 0.3);
+  color: var(--qc-cyan-03);
   font-family: 'Share Tech Mono', monospace;
   letter-spacing: 0.5px;
   pointer-events: auto;
@@ -155,11 +173,11 @@ provide('openSettings', () => { showSettings.value = true })
   transition: color 0.2s ease;
 }
 .credits:hover {
-  color: rgba(0, 240, 255, 0.6);
+  color: var(--qc-cyan-05);
 }
 .disclaimer {
   font-size: 9px;
-  color: rgba(197, 208, 224, 0.25);
+  color: var(--qc-text-faint);
   font-family: 'Share Tech Mono', monospace;
   letter-spacing: 0.3px;
   pointer-events: none;

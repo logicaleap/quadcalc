@@ -94,16 +94,16 @@ const activeHints = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(13, 17, 23, 0.95);
-  border: 1px solid rgba(255, 0, 60, 0.2);
+  background: var(--qc-surface-hover);
+  border: 1px solid var(--qc-red-02);
   padding: 6px 12px;
   cursor: pointer;
   backdrop-filter: blur(8px);
 }
 
 .alerts-list {
-  background: rgba(13, 17, 23, 0.95);
-  border: 1px solid rgba(0, 240, 255, 0.1);
+  background: var(--qc-surface-hover);
+  border: 1px solid var(--qc-cyan-01);
   border-top: none;
   padding: 8px;
   max-height: 300px;
@@ -118,19 +118,19 @@ const activeHints = computed(() => {
 }
 
 .alert-error {
-  border-color: var(--color-tron-red);
-  background: rgba(255, 0, 60, 0.04);
-  color: #ffa0b4;
+  border-color: var(--qc-red);
+  background: var(--qc-red-004);
+  color: var(--qc-alert-error-text);
 }
 .alert-warning {
-  border-color: var(--color-tron-yellow);
-  background: rgba(255, 184, 0, 0.04);
-  color: #ffe0a0;
+  border-color: var(--qc-yellow);
+  background: var(--qc-yellow-004);
+  color: var(--qc-alert-warning-text);
 }
 .alert-info {
-  border-color: rgba(0, 240, 255, 0.3);
-  background: rgba(0, 240, 255, 0.02);
-  color: rgba(197, 208, 224, 0.7);
+  border-color: var(--qc-cyan-03);
+  background: var(--qc-cyan-005);
+  color: var(--qc-alert-info-text);
 }
 
 .severity-badge {
@@ -140,16 +140,16 @@ const activeHints = computed(() => {
   letter-spacing: 0.5px;
 }
 .alert-error .severity-badge {
-  background: rgba(255, 0, 60, 0.15);
-  color: var(--color-tron-red);
+  background: var(--qc-red-015);
+  color: var(--qc-red);
 }
 .alert-warning .severity-badge {
-  background: rgba(255, 184, 0, 0.15);
-  color: var(--color-tron-yellow);
+  background: var(--qc-yellow-015);
+  color: var(--qc-yellow);
 }
 .alert-info .severity-badge {
-  background: rgba(0, 240, 255, 0.1);
-  color: rgba(0, 240, 255, 0.5);
+  background: var(--qc-cyan-01);
+  color: var(--qc-cyan-05);
 }
 
 .wiring-section {
@@ -160,16 +160,16 @@ const activeHints = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(13, 17, 23, 0.95);
-  border: 1px solid rgba(61, 90, 254, 0.25);
+  background: var(--qc-surface-hover);
+  border: 1px solid var(--qc-blue-025);
   padding: 6px 12px;
   cursor: pointer;
   backdrop-filter: blur(8px);
 }
 
 .wiring-list {
-  background: rgba(13, 17, 23, 0.95);
-  border: 1px solid rgba(61, 90, 254, 0.15);
+  background: var(--qc-surface-hover);
+  border: 1px solid var(--qc-blue-015);
   border-top: none;
   padding: 8px;
   max-height: 200px;
@@ -180,9 +180,9 @@ const activeHints = computed(() => {
 .wiring-item {
   padding: 6px 8px;
   margin-bottom: 4px;
-  border-left: 2px solid var(--color-tron-blue);
-  background: rgba(61, 90, 254, 0.04);
-  color: rgba(197, 208, 224, 0.7);
+  border-left: 2px solid var(--qc-blue);
+  background: var(--qc-blue-004);
+  color: var(--qc-alert-info-text);
 }
 
 .expand-enter-active, .expand-leave-active {

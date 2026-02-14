@@ -83,7 +83,7 @@ function save() {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--qc-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,9 +104,12 @@ select.tron-input {
   background-position: right 8px center;
   padding-right: 28px;
 }
+:global(.light-theme) select.tron-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230891b2' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+}
 select.tron-input option {
-  background: #0d1117;
-  color: #c5d0e0;
+  background: var(--qc-select-bg);
+  color: var(--qc-select-text);
 }
 
 .modal-enter-active, .modal-leave-active {

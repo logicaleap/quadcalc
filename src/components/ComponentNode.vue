@@ -72,7 +72,7 @@
     <text
       v-if="component"
       text-anchor="middle"
-      fill="#c5d0e0"
+      :fill="subtextColor"
       font-size="8"
       font-family="Share Tech Mono, monospace"
       y="58"
@@ -96,6 +96,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useTheme } from '../composables/useTheme.js'
 import { ICONS } from '../utils/icons.js'
 
 const props = defineProps({
@@ -109,6 +110,8 @@ const props = defineProps({
 
 defineEmits(['select'])
 
+const { isDark } = useTheme()
+
 const iconData = computed(() => ICONS[props.category.icon] || { paths: [] })
 
 const truncatedName = computed(() => {
@@ -117,31 +120,49 @@ const truncatedName = computed(() => {
   return n.length > 20 ? n.slice(0, 18) + '...' : n
 })
 
+const subtextColor = computed(() => isDark.value ? '#c5d0e0' : '#4a5568')
+
 const borderColor = computed(() => {
-  if (props.status === 'error') return '#ff003c'
-  if (props.status === 'warning') return '#ffb800'
-  if (props.status === 'ok') return '#00ff88'
-  return 'rgba(0,240,255,0.3)'
+  const red = isDark.value ? '#ff003c' : '#dc2626'
+  const yellow = isDark.value ? '#ffb800' : '#d97706'
+  const green = isDark.value ? '#00ff88' : '#059669'
+  const cyan = isDark.value ? 'rgba(0,240,255,0.3)' : 'rgba(8,145,178,0.3)'
+  if (props.status === 'error') return red
+  if (props.status === 'warning') return yellow
+  if (props.status === 'ok') return green
+  return cyan
 })
 
 const glowFill = computed(() => {
-  if (props.status === 'error') return 'rgba(255,0,60,0.08)'
-  if (props.status === 'warning') return 'rgba(255,184,0,0.08)'
-  if (props.status === 'ok') return 'rgba(0,255,136,0.08)'
-  return 'rgba(0,240,255,0.05)'
+  const red = isDark.value ? 'rgba(255,0,60,0.08)' : 'rgba(220,38,38,0.08)'
+  const yellow = isDark.value ? 'rgba(255,184,0,0.08)' : 'rgba(217,119,6,0.08)'
+  const green = isDark.value ? 'rgba(0,255,136,0.08)' : 'rgba(5,150,105,0.08)'
+  const cyan = isDark.value ? 'rgba(0,240,255,0.05)' : 'rgba(8,145,178,0.05)'
+  if (props.status === 'error') return red
+  if (props.status === 'warning') return yellow
+  if (props.status === 'ok') return green
+  return cyan
 })
 
 const textColor = computed(() => {
-  if (props.status === 'error') return '#ff003c'
-  if (props.status === 'warning') return '#ffb800'
-  if (props.status === 'ok') return '#00ff88'
-  return '#00f0ff'
+  const red = isDark.value ? '#ff003c' : '#dc2626'
+  const yellow = isDark.value ? '#ffb800' : '#d97706'
+  const green = isDark.value ? '#00ff88' : '#059669'
+  const cyan = isDark.value ? '#00f0ff' : '#0891b2'
+  if (props.status === 'error') return red
+  if (props.status === 'warning') return yellow
+  if (props.status === 'ok') return green
+  return cyan
 })
 
 const lineColor = computed(() => {
-  if (props.status === 'error') return '#ff003c'
-  if (props.status === 'warning') return '#ffb800'
-  if (props.status === 'ok') return '#00ff88'
-  return 'rgba(0,240,255,0.3)'
+  const red = isDark.value ? '#ff003c' : '#dc2626'
+  const yellow = isDark.value ? '#ffb800' : '#d97706'
+  const green = isDark.value ? '#00ff88' : '#059669'
+  const cyan = isDark.value ? 'rgba(0,240,255,0.3)' : 'rgba(8,145,178,0.3)'
+  if (props.status === 'error') return red
+  if (props.status === 'warning') return yellow
+  if (props.status === 'ok') return green
+  return cyan
 })
 </script>

@@ -1,13 +1,13 @@
 <template>
-  <div class="space-y-2">
+  <div class="selector-root">
     <input
       v-model="search"
       type="text"
-      class="tron-input w-full text-sm"
+      class="tron-input w-full text-sm shrink-0"
       placeholder="Search components..."
     />
 
-    <div class="max-h-64 overflow-y-auto space-y-1 pr-1">
+    <div class="selector-list">
       <div
         v-for="item in filtered"
         :key="item.id"
@@ -76,3 +76,22 @@ function mainSpecs(item) {
   return Object.fromEntries(entries.map(([k, v]) => [k, Array.isArray(v) ? v.join('/') : v]))
 }
 </script>
+
+<style scoped>
+.selector-root {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  min-height: 0;
+}
+.selector-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+</style>

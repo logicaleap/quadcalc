@@ -62,16 +62,17 @@
         </div>
       </div>
 
-      <div v-else class="text-center text-tron-text/40 py-4 text-sm">
+      <div v-else class="text-center text-tron-text/40 py-4 text-sm shrink-0">
         No component selected. Pick one below.
       </div>
 
       <!-- Separator -->
-      <div class="border-t border-tron-cyan/10 my-3"></div>
+      <div class="border-t border-tron-cyan/10 my-3 shrink-0"></div>
 
       <!-- Selector -->
-      <div class="text-xs text-tron-text/50 mb-2 uppercase tracking-wider font-semibold">Choose from presets</div>
+      <div class="text-xs text-tron-text/50 mb-2 uppercase tracking-wider font-semibold shrink-0">Choose from presets</div>
       <ComponentSelector
+        class="flex-1 min-h-0"
         :items="presetItems"
         :selected="currentComponent"
         @select="selectComponent"
@@ -137,8 +138,16 @@ function clearSlot() {
   bottom: 0;
   width: 340px;
   padding: 16px;
-  overflow-y: auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   z-index: 20;
+}
+
+.current-component {
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 40%;
 }
 
 .panel-header {
@@ -148,6 +157,7 @@ function clearSlot() {
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(0, 240, 255, 0.1);
+  flex-shrink: 0;
 }
 
 .spec-chip {

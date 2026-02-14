@@ -72,7 +72,7 @@ const store = useBuildStore()
 const { alerts, errors, warnings, infos } = useCompatibility()
 const expanded = ref(true)
 const showExplanations = ref(true)
-const wiringExpanded = ref(true)
+const wiringExpanded = ref(false)
 
 const activeHints = computed(() => {
   return wiringHints.filter(h =>

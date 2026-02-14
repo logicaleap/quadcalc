@@ -360,3 +360,74 @@ h1, h2, h3, h4, h5, h6 {
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;
 }
+
+/* ============================================================
+   Node Tron Animations (SVG circle overlays)
+   ============================================================ */
+@keyframes node-power-on {
+  0%   { r: 16; opacity: 0.8; stroke-width: 3; }
+  60%  { r: 48; opacity: 0.4; stroke-width: 1.5; }
+  100% { r: 56; opacity: 0; stroke-width: 0.5; }
+}
+@keyframes node-power-on-ring {
+  0%   { r: 10; opacity: 1; }
+  100% { r: 60; opacity: 0; }
+}
+@keyframes node-power-off {
+  0%   { r: 32; opacity: 0.8; }
+  100% { r: 8; opacity: 0; }
+}
+@keyframes node-lock-in {
+  0%   { r: 32; opacity: 0.9; stroke-width: 2; }
+  40%  { r: 38; opacity: 1; stroke-width: 3; }
+  100% { r: 32; opacity: 0; stroke-width: 1; }
+}
+@keyframes node-error-pulse {
+  0%   { r: 32; opacity: 0.9; }
+  15%  { r: 32; opacity: 0.9; transform: translateX(2px); }
+  30%  { r: 32; opacity: 0.9; transform: translateX(-2px); }
+  45%  { r: 32; opacity: 0.9; transform: translateX(1px); }
+  60%  { r: 40; opacity: 0.5; transform: translateX(0); }
+  100% { r: 50; opacity: 0; }
+}
+@keyframes node-error-ring {
+  0%   { r: 32; opacity: 0.8; }
+  100% { r: 55; opacity: 0; }
+}
+@keyframes node-ok-flash {
+  0%   { r: 28; opacity: 1; stroke-width: 3; }
+  50%  { r: 44; opacity: 0.6; stroke-width: 1.5; }
+  100% { r: 52; opacity: 0; stroke-width: 0.5; }
+}
+@keyframes node-warning-pulse {
+  0%   { opacity: 0.3; }
+  25%  { opacity: 1; }
+  50%  { opacity: 0.3; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.anim-power-on {
+  animation: node-power-on 600ms ease-out forwards;
+}
+.anim-ring-power-on {
+  animation: node-power-on-ring 600ms ease-out forwards;
+}
+.anim-power-off {
+  animation: node-power-off 400ms ease-in forwards;
+}
+.anim-lock-in {
+  animation: node-lock-in 300ms ease-out forwards;
+}
+.anim-error-pulse {
+  animation: node-error-pulse 800ms ease-out forwards;
+}
+.anim-ring-error-pulse {
+  animation: node-error-ring 800ms ease-out forwards;
+}
+.anim-ok-flash {
+  animation: node-ok-flash 500ms ease-out forwards;
+}
+.anim-warning-pulse {
+  animation: node-warning-pulse 700ms ease-in-out forwards;
+}

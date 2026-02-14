@@ -3,6 +3,8 @@
     class="component-node"
     :class="{ selected: isSelected }"
     :transform="`translate(${x}, ${y})`"
+    :data-node-key="category.key"
+    :style="nodeStyle"
   >
     <!-- Connecting line from center (non-interactive) -->
     <line
@@ -15,13 +17,12 @@
       pointer-events="none"
     />
 
-    <!-- Clickable hit area -->
+    <!-- Clickable hit area (click handled by parent via pointer events) -->
     <circle
       r="40"
       fill="transparent"
       pointer-events="all"
-      style="cursor: pointer;"
-      @click="$emit('select', category.key)"
+      :style="cursorStyle"
     />
 
     <!-- Outer ring glow -->
@@ -91,6 +92,29 @@
       class="animate-pulse-glow"
       pointer-events="none"
     />
+
+    <!-- Animation overlays -->
+    <circle
+      v-if="animation && animation.active"
+      class="node-anim-overlay"
+      :class="'anim-' + animation.type"
+      r="32"
+      fill="none"
+      :stroke="animOverlayColor"
+      :stroke-width="animStrokeWidth"
+      pointer-events="none"
+    />
+    <!-- Secondary ring for power-on / error-pulse -->
+    <circle
+      v-if="animation && animation.active && (animation.type === 'power-on' || animation.type === 'error-pulse')"
+      class="node-anim-ring"
+      :class="'anim-ring-' + animation.type"
+      r="32"
+      fill="none"
+      :stroke="animOverlayColor"
+      stroke-width="1"
+      pointer-events="none"
+    />
   </g>
 </template>
 
@@ -106,9 +130,9 @@ const props = defineProps({
   x: { type: Number, required: true },
   y: { type: Number, required: true },
   isSelected: { type: Boolean, default: false },
+  isDragging: { type: Boolean, default: false },
+  animation: { type: Object, default: null },
 })
-
-defineEmits(['select'])
 
 const { isDark } = useTheme()
 
@@ -118,6 +142,16 @@ const truncatedName = computed(() => {
   if (!props.component?.name) return ''
   const n = props.component.name
   return n.length > 20 ? n.slice(0, 18) + '...' : n
+})
+
+const cursorStyle = computed(() => ({
+  cursor: props.isDragging ? 'grabbing' : 'grab',
+}))
+
+const nodeStyle = computed(() => {
+  if (props.isDragging) return {}
+  // Smooth transition when not being dragged (e.g. during reset)
+  return { transition: 'transform 0.3s ease-out' }
 })
 
 const subtextColor = computed(() => isDark.value ? '#c5d0e0' : '#4a5568')
@@ -164,5 +198,22 @@ const lineColor = computed(() => {
   if (props.status === 'warning') return yellow
   if (props.status === 'ok') return green
   return cyan
+})
+
+const animOverlayColor = computed(() => {
+  if (!props.animation) return 'transparent'
+  const t = props.animation.type
+  if (t === 'error-pulse') return isDark.value ? '#ff003c' : '#dc2626'
+  if (t === 'ok-flash') return isDark.value ? '#00ff88' : '#059669'
+  if (t === 'warning-pulse') return isDark.value ? '#ffb800' : '#d97706'
+  // power-on, power-off, lock-in use the accent cyan/green
+  return isDark.value ? '#00f0ff' : '#0891b2'
+})
+
+const animStrokeWidth = computed(() => {
+  if (!props.animation) return 1
+  const t = props.animation.type
+  if (t === 'error-pulse' || t === 'power-on') return 2
+  return 1.5
 })
 </script>

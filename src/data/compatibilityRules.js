@@ -312,6 +312,44 @@ export const compatibilityRules = [
       return null
     },
   },
+
+  // ═══════════════════════════════════════════════════
+  // FC ↔ ESC: AIO redundant ESC warning
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'fc-esc-aio',
+    name: 'AIO FC ↔ Standalone ESC',
+    description: 'AIO flight controllers include an integrated ESC. Adding a standalone ESC is usually redundant.',
+    categories: ['fc', 'esc'],
+    severity: 'warning',
+    check(fc, esc) {
+      if (fc.specs?.aio && !esc._aioVirtual)
+        return `Your AIO FC already includes an ESC. The standalone ESC is redundant unless you need higher current.`
+      return null
+    },
+  },
+
+  // ═══════════════════════════════════════════════════
+  // VTX ↔ ANTENNA: Connector type must match
+  // ═══════════════════════════════════════════════════
+  {
+    id: 'vtx-antenna-connector',
+    name: 'VTX ↔ Antenna Connector',
+    description: 'VTX and antenna RF connectors must match (SMA, MMCX, UFL, RP-SMA). Mismatched connectors need adapters that add weight and signal loss.',
+    categories: ['vtx', 'antenna'],
+    severity: 'warning',
+    check(vtx, antenna) {
+      if (!vtx.specs?.connector || !antenna.specs?.connector) return null
+      if (antenna.specs.frequency !== '5.8GHz') return null
+      const vtxConn = vtx.specs.connector
+      const antConn = antenna.specs.connector
+      if (vtxConn === antConn) return null
+      const smaFamily = new Set(['SMA', 'RP-SMA'])
+      if (smaFamily.has(vtxConn) && smaFamily.has(antConn))
+        return `VTX has ${vtxConn} but antenna is ${antConn}. You'll need a simple SMA↔RP-SMA adapter — cheap and minimal signal loss.`
+      return `VTX has ${vtxConn} but antenna is ${antConn}. You'll need a ${vtxConn}↔${antConn} adapter pigtail, which adds weight and signal loss.`
+    },
+  },
 ]
 
 /**
@@ -335,4 +373,6 @@ export const compatibilityExplanations = {
   'esc-fc-mount': 'The ESC and FC are typically stacked together. Matching mount patterns make assembly much easier.',
   'battery-frame-size': 'Small frames need small, light batteries. Large frames need powerful batteries for adequate flight time.',
   'motor-esc-current': 'The ESC current rating must exceed the motor\'s peak current draw. Underpowered ESCs can overheat and fail mid-flight.',
+  'fc-esc-aio': 'AIO (All-in-One) flight controllers have the ESC built onto the same board. Adding a separate standalone ESC is redundant unless you specifically need higher current capacity than the integrated one provides.',
+  'vtx-antenna-connector': 'VTX and antenna connect via an RF connector. Common types are SMA, RP-SMA, MMCX, and UFL. Mismatched connectors require adapter pigtails that add weight, bulk, and signal loss. SMA↔RP-SMA adapters are simple screw-on and cause minimal loss.',
 }

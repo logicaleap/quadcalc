@@ -137,6 +137,34 @@ export const useBuildStore = defineStore('build', () => {
     return (battery.specs.capacity * 0.8) / (avgCurrentA * 1000) * 60
   })
 
+  function handleAioEsc(fcComponent) {
+    const esc = components.value.esc
+    if (fcComponent && fcComponent.specs?.aio) {
+      // Only auto-fill if ESC is empty or already a virtual AIO ESC
+      if (!esc || esc._aioVirtual) {
+        components.value.esc = {
+          id: 'esc-aio-virtual',
+          name: `Included in ${fcComponent.name}`,
+          description: 'ESC integrated into AIO flight controller',
+          cost: 0,
+          weight: 0,
+          category: 'esc',
+          _aioVirtual: true,
+          specs: {
+            voltage: fcComponent.specs.voltage,
+            protocol: fcComponent.specs.protocol,
+            mountPattern: fcComponent.specs.mountPattern,
+          },
+        }
+      }
+    } else {
+      // FC cleared or changed to non-AIO — remove virtual ESC only
+      if (esc?._aioVirtual) {
+        components.value.esc = null
+      }
+    }
+  }
+
   function setComponent(category, component) {
     pushUndo()
     if (component) {
@@ -144,11 +172,13 @@ export const useBuildStore = defineStore('build', () => {
     } else {
       components.value[category] = null
     }
+    if (category === 'fc') handleAioEsc(components.value.fc)
   }
 
   function clearComponent(category) {
     pushUndo()
     components.value[category] = null
+    if (category === 'fc') handleAioEsc(null)
   }
 
   function clearAll() {

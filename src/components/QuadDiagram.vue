@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, inject } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
 import { CATEGORIES } from '../utils/helpers.js'
@@ -73,13 +73,14 @@ import ComponentNode from './ComponentNode.vue'
 const store = useBuildStore()
 const { getCategoryStatus } = useCompatibility()
 const wrapperRef = ref(null)
+const isMobile = inject('isMobile', ref(false))
 
 const categories = CATEGORIES
-const svgSize = 700
-const svgHalf = svgSize / 2
+const svgSize = computed(() => isMobile.value ? 500 : 700)
+const svgHalf = computed(() => svgSize.value / 2)
 
 const nodePositions = computed(() => {
-  const radius = 240
+  const radius = isMobile.value ? 170 : 240
   const count = categories.length
   return categories.map((_, i) => {
     const angle = (i / count) * Math.PI * 2 - Math.PI / 2

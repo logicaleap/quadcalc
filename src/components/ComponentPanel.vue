@@ -1,6 +1,6 @@
 <template>
   <Transition name="slide">
-    <div v-if="store.selectedCategory" class="component-panel tron-panel animate-fade-in">
+    <div v-if="store.selectedCategory" class="component-panel tron-panel animate-fade-in" :class="{ 'mobile-panel': isMobile }">
       <div class="panel-header">
         <div class="flex items-center gap-2">
           <svg v-if="currentIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-tron-cyan">
@@ -73,11 +73,18 @@
       <!-- Separator -->
       <div class="border-t border-tron-cyan/10 my-3 shrink-0"></div>
 
-      <!-- Selector -->
-      <div class="text-xs text-tron-text/50 mb-2 uppercase tracking-wider font-semibold shrink-0">Choose from presets</div>
+      <!-- Selector header with filter toggle -->
+      <div class="flex items-center justify-between mb-2 shrink-0">
+        <div class="text-xs text-tron-text/50 uppercase tracking-wider font-semibold">Choose from presets</div>
+        <label class="compat-toggle">
+          <input type="checkbox" v-model="hideIncompatible" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Compatible only</span>
+        </label>
+      </div>
       <ComponentSelector
         class="flex-1 min-h-0"
-        :items="presetItems"
+        :items="displayItems"
         :selected="currentComponent"
         @select="selectComponent"
       />
@@ -86,18 +93,21 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
 import { useStorage } from '../composables/useStorage.js'
 import { CATEGORY_MAP, formatCurrency, formatWeight } from '../utils/helpers.js'
 import { ICONS } from '../utils/icons.js'
 import { presets } from '../data/presets.js'
+import { compatibilityRules } from '../data/compatibilityRules.js'
 import ComponentSelector from './ComponentSelector.vue'
 
 const store = useBuildStore()
 const { alerts } = useCompatibility()
 const { getCustomPresets } = useStorage()
+const isMobile = inject('isMobile', ref(false))
+const hideIncompatible = ref(false)
 
 const currentCat = computed(() => {
   if (!store.selectedCategory) return null
@@ -121,8 +131,37 @@ const presetItems = computed(() => {
   if (!store.selectedCategory) return []
   const builtIn = presets[store.selectedCategory] || []
   const custom = getCustomPresets()[store.selectedCategory] || []
-  // Custom presets first, marked with _custom flag
   return [...custom, ...builtIn]
+})
+
+// Rules that involve the current category, with the other category's component already selected
+const activeRules = computed(() => {
+  if (!store.selectedCategory) return []
+  return compatibilityRules
+    .filter(r => r.severity === 'error' && r.categories.includes(store.selectedCategory))
+    .map(r => {
+      const otherCat = r.categories[0] === store.selectedCategory ? r.categories[1] : r.categories[0]
+      const otherComp = store.components[otherCat]
+      if (!otherComp) return null
+      const thisIsFirst = r.categories[0] === store.selectedCategory
+      return { rule: r, otherComp, thisIsFirst }
+    })
+    .filter(Boolean)
+})
+
+function isIncompatible(item) {
+  const mockComp = { ...item, category: store.selectedCategory }
+  for (const { rule, otherComp, thisIsFirst } of activeRules.value) {
+    const a = thisIsFirst ? mockComp : otherComp
+    const b = thisIsFirst ? otherComp : mockComp
+    if (rule.check(a, b)) return true
+  }
+  return false
+}
+
+const displayItems = computed(() => {
+  if (!hideIncompatible.value) return presetItems.value
+  return presetItems.value.filter(item => !isIncompatible(item))
 })
 
 const relatedAlerts = computed(() => {
@@ -190,11 +229,83 @@ function clearSlot() {
   font-weight: 600;
 }
 
+.compat-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+.compat-toggle input {
+  display: none;
+}
+.toggle-track {
+  width: 28px;
+  height: 14px;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 7px;
+  position: relative;
+  transition: all 0.2s;
+}
+.toggle-thumb {
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  width: 10px;
+  height: 10px;
+  background: rgba(197, 208, 224, 0.4);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.compat-toggle input:checked + .toggle-track {
+  background: rgba(0, 240, 255, 0.2);
+  border-color: var(--color-tron-cyan);
+}
+.compat-toggle input:checked + .toggle-track .toggle-thumb {
+  left: 15px;
+  background: var(--color-tron-cyan);
+}
+.toggle-label {
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  color: rgba(197, 208, 224, 0.4);
+  letter-spacing: 0.3px;
+}
+.compat-toggle input:checked ~ .toggle-label {
+  color: var(--color-tron-cyan);
+}
+
+.mobile-panel {
+  position: fixed;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  top: auto;
+  width: 100%;
+  height: 65vh;
+  border-radius: 12px 12px 0 0;
+  border-top: 2px solid rgba(0, 240, 255, 0.3);
+}
+.mobile-panel::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 2px;
+  margin: 0 auto 8px;
+}
+
 .slide-enter-active, .slide-leave-active {
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 .slide-enter-from, .slide-leave-to {
   transform: translateX(100%);
   opacity: 0;
+}
+.mobile-panel.slide-enter-from,
+.mobile-panel.slide-leave-to {
+  transform: translateY(100%);
 }
 </style>

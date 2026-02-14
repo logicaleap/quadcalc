@@ -95,14 +95,47 @@ export const useBuildStore = defineStore('build', () => {
     }, 0)
   )
 
+  // Ground equipment excluded from weight (they don't fly on the quad)
+  const GROUND_CATEGORIES = new Set(['tx', 'goggles'])
+
   const totalWeight = computed(() =>
     Object.values(components.value).reduce((sum, c) => {
-      if (!c?.weight) return sum
-      // Motors and props: multiply by 4
+      if (!c?.weight || GROUND_CATEGORIES.has(c.category)) return sum
       if (c.category === 'motors' || c.category === 'propellers') return sum + c.weight * 4
       return sum + c.weight
     }, 0)
   )
+
+  const weightBreakdown = computed(() => {
+    const breakdown = {}
+    for (const cat of CATEGORIES) {
+      if (GROUND_CATEGORIES.has(cat.key)) { breakdown[cat.key] = 0; continue }
+      const c = components.value[cat.key]
+      if (!c?.weight) { breakdown[cat.key] = 0; continue }
+      breakdown[cat.key] = (c.category === 'motors' || c.category === 'propellers') ? c.weight * 4 : c.weight
+    }
+    breakdown.total = Object.values(breakdown).reduce((s, v) => s + v, 0)
+    return breakdown
+  })
+
+  const thrustToWeightRatio = computed(() => {
+    const motor = components.value.motors
+    if (!motor?.specs?.thrust_grams || !totalWeight.value) return null
+    // Use 80% of peak static thrust for realistic effective TWR
+    return (motor.specs.thrust_grams * 4 * 0.8) / totalWeight.value
+  })
+
+  const estimatedFlightTime = computed(() => {
+    const battery = components.value.battery
+    if (!battery?.specs?.capacity || !totalWeight.value) return null
+    // Estimate average power: ~200W per kg at moderate FPV flying
+    const cells = parseInt(battery.specs.voltage) || 4
+    const nominalVoltage = cells * 3.7
+    const avgPowerW = (totalWeight.value / 1000) * 200
+    const avgCurrentA = avgPowerW / nominalVoltage
+    // Flight time with 80% usable capacity
+    return (battery.specs.capacity * 0.8) / (avgCurrentA * 1000) * 60
+  })
 
   function setComponent(category, component) {
     pushUndo()
@@ -171,6 +204,9 @@ export const useBuildStore = defineStore('build', () => {
     filledCount,
     totalCost,
     totalWeight,
+    weightBreakdown,
+    thrustToWeightRatio,
+    estimatedFlightTime,
     canUndo,
     canRedo,
     undo,

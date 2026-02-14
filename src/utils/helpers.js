@@ -34,3 +34,8 @@ export const CATEGORIES = [
 ]
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.key, c]))
+
+export function formatTWR(ratio) {
+  if (ratio == null) return '—'
+  return `${ratio.toFixed(1)}:1`
+}

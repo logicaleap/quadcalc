@@ -1,5 +1,5 @@
 <template>
-  <div v-if="alerts.length > 0" class="compat-alerts">
+  <div v-if="alerts.length > 0 || activeHints.length > 0" class="compat-alerts">
     <div class="alerts-header" @click="expanded = !expanded">
       <div class="flex items-center gap-2">
         <span v-if="errors.length" class="text-tron-red font-bold text-xs">{{ errors.length }} ERROR{{ errors.length > 1 ? 'S' : '' }}</span>
@@ -42,22 +42,49 @@
         </button>
       </div>
     </Transition>
+
+    <!-- Wiring Hints -->
+    <Transition name="expand">
+      <div v-if="activeHints.length > 0" class="wiring-section">
+        <div class="wiring-header" @click="wiringExpanded = !wiringExpanded">
+          <span class="text-tron-blue font-bold text-xs">{{ activeHints.length }} WIRING</span>
+          <span class="text-tron-cyan/40 text-xs">{{ wiringExpanded ? '▼' : '▶' }}</span>
+        </div>
+        <Transition name="expand">
+          <div v-if="wiringExpanded" class="wiring-list">
+            <div v-for="(h, i) in activeHints" :key="i" class="wiring-item">
+              <div class="text-[11px] leading-snug">{{ h.hint }}</div>
+            </div>
+          </div>
+        </Transition>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
+import { wiringHints } from '../data/wiringHints.js'
 
+const store = useBuildStore()
 const { alerts, errors, warnings, infos } = useCompatibility()
 const expanded = ref(true)
 const showExplanations = ref(true)
+const wiringExpanded = ref(true)
+
+const activeHints = computed(() => {
+  return wiringHints.filter(h =>
+    h.categories.every(cat => store.components[cat] != null)
+  )
+})
 </script>
 
 <style scoped>
 .compat-alerts {
   position: absolute;
-  bottom: 12px;
+  bottom: 30px;
   left: 12px;
   max-width: 380px;
   z-index: 15;
@@ -123,6 +150,39 @@ const showExplanations = ref(true)
 .alert-info .severity-badge {
   background: rgba(0, 240, 255, 0.1);
   color: rgba(0, 240, 255, 0.5);
+}
+
+.wiring-section {
+  margin-top: 4px;
+}
+
+.wiring-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(13, 17, 23, 0.95);
+  border: 1px solid rgba(61, 90, 254, 0.25);
+  padding: 6px 12px;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+}
+
+.wiring-list {
+  background: rgba(13, 17, 23, 0.95);
+  border: 1px solid rgba(61, 90, 254, 0.15);
+  border-top: none;
+  padding: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  backdrop-filter: blur(8px);
+}
+
+.wiring-item {
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-left: 2px solid var(--color-tron-blue);
+  background: rgba(61, 90, 254, 0.04);
+  color: rgba(197, 208, 224, 0.7);
 }
 
 .expand-enter-active, .expand-leave-active {

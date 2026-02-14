@@ -24,10 +24,12 @@
           <div class="border-t border-tron-cyan/10 my-3"></div>
 
           <!-- Export / Import -->
-          <div class="grid grid-cols-3 gap-2 mb-4">
+          <div class="grid grid-cols-2 gap-2 mb-4">
             <button class="tron-btn text-xs" @click="handleExport">EXPORT JSON</button>
             <button class="tron-btn text-xs" @click="handleExportCsv">EXPORT CSV</button>
-            <label class="tron-btn text-xs text-center cursor-pointer">
+            <button class="tron-btn text-xs" :class="{ 'tron-btn-success': shoppingCopied }" @click="handleCopyShoppingList">{{ shoppingCopied ? 'COPIED!' : 'COPY SHOPPING LIST' }}</button>
+            <button class="tron-btn text-xs" :class="{ 'tron-btn-success': shareCopied }" @click="handleShareLink">{{ shareCopied ? 'LINK COPIED!' : 'SHARE LINK' }}</button>
+            <label class="tron-btn text-xs text-center cursor-pointer col-span-2">
               IMPORT JSON
               <input type="file" accept=".json" class="hidden" @change="handleImport" />
             </label>
@@ -38,6 +40,26 @@
           <!-- Clear -->
           <div class="mb-4">
             <button class="tron-btn-danger tron-btn text-xs w-full" @click="handleClear">CLEAR CURRENT BUILD</button>
+          </div>
+
+          <div class="border-t border-tron-cyan/10 my-3"></div>
+
+          <!-- Starter builds -->
+          <div class="mb-4">
+            <label class="text-xs text-tron-text/50 uppercase tracking-wider font-mono block mb-2">
+              Starter Builds
+            </label>
+            <div class="grid grid-cols-1 gap-1.5">
+              <button
+                v-for="tpl in templates"
+                :key="tpl.id"
+                class="text-left p-2 tron-border hover:border-tron-cyan/30 transition-colors"
+                @click="handleLoadTemplate(tpl)"
+              >
+                <div class="text-sm text-tron-cyan font-semibold">{{ tpl.name }}</div>
+                <div class="text-[10px] text-tron-text/40 mt-0.5">{{ tpl.description }}</div>
+              </button>
+            </div>
           </div>
 
           <div class="border-t border-tron-cyan/10 my-3"></div>
@@ -87,6 +109,8 @@
 import { ref, watch } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 import { useStorage } from '../composables/useStorage.js'
+import { templates } from '../data/templates.js'
+import { presets } from '../data/presets.js'
 
 const props = defineProps({
   show: Boolean,
@@ -99,10 +123,13 @@ const {
   savedBuilds, loadSavedBuilds,
   saveBuild, loadBuild, deleteBuild,
   exportBuildToFile, exportBuildToCsv, importBuildFromFile,
+  copyShoppingList, copyShareUrl,
 } = useStorage()
 
 const saveName = ref('')
 const statusMsg = ref('')
+const shoppingCopied = ref(false)
+const shareCopied = ref(false)
 
 watch(() => props.show, (val) => {
   if (val) {
@@ -111,6 +138,18 @@ watch(() => props.show, (val) => {
     statusMsg.value = ''
   }
 })
+
+function handleLoadTemplate(tpl) {
+  const comps = {}
+  for (const [cat, presetId] of Object.entries(tpl.presetIds)) {
+    const list = presets[cat] || []
+    const found = list.find(p => p.id === presetId)
+    if (found) comps[cat] = { ...found, category: cat }
+  }
+  store.loadBuild({ name: tpl.name, components: comps })
+  statusMsg.value = `Loaded "${tpl.name}"`
+  setTimeout(() => { statusMsg.value = '' }, 2000)
+}
 
 function handleSave() {
   const name = saveName.value.trim() || 'Untitled Build'
@@ -137,6 +176,28 @@ function handleClear() {
   store.clearAll()
   statusMsg.value = 'Build cleared'
   setTimeout(() => { statusMsg.value = '' }, 2000)
+}
+
+async function handleShareLink() {
+  try {
+    await copyShareUrl()
+    shareCopied.value = true
+    setTimeout(() => { shareCopied.value = false }, 2000)
+  } catch {
+    statusMsg.value = 'Failed to copy link'
+    setTimeout(() => { statusMsg.value = '' }, 2000)
+  }
+}
+
+async function handleCopyShoppingList() {
+  try {
+    await copyShoppingList()
+    shoppingCopied.value = true
+    setTimeout(() => { shoppingCopied.value = false }, 2000)
+  } catch {
+    statusMsg.value = 'Failed to copy list'
+    setTimeout(() => { statusMsg.value = '' }, 2000)
+  }
 }
 
 function handleExport() {

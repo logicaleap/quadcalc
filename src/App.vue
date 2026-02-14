@@ -1,5 +1,5 @@
 <template>
-  <div class="app-root">
+  <div class="app-root" :class="{ mobile: isMobile }">
     <TronGrid />
 
     <!-- Top bar -->
@@ -12,11 +12,6 @@
         <span class="text-tron-text/20 text-xs font-mono hidden sm:inline">FPV BUILD PLANNER</span>
       </div>
       <div class="flex items-center gap-2">
-        <input
-          v-model="store.buildName"
-          class="tron-input text-xs w-40 text-center"
-          placeholder="Build name..."
-        />
         <button class="tron-btn text-xs" @click="showUrlImport = true">IMPORT URL</button>
         <button class="tron-btn text-xs" @click="showSaveLoad = true">BUILDS</button>
         <button class="tron-btn text-xs" @click="showSettings = true">SETTINGS</button>
@@ -41,8 +36,11 @@
     <!-- AI Chat (bottom right) -->
     <AiChat />
 
-    <!-- Credits -->
-    <a href="mailto:contact@shamir.com.au" class="credits">Built by Asaf Shamir · contact@shamir.com.au</a>
+    <!-- Credits & Disclaimer -->
+    <div class="bottom-info">
+      <a href="mailto:contact@shamir.com.au" class="credits">Built by Asaf Shamir · contact@shamir.com.au</a>
+      <span class="disclaimer">Compatibility data is provided as guidance only. Always verify component specifications before purchasing.</span>
+    </div>
 
     <!-- Modals -->
     <SaveLoadModal :show="showSaveLoad" @close="showSaveLoad = false" />
@@ -53,8 +51,9 @@
 </template>
 
 <script setup>
-import { ref, provide } from 'vue'
+import { ref, provide, onMounted, onUnmounted } from 'vue'
 import { useBuildStore } from './stores/buildStore.js'
+import { useStorage } from './composables/useStorage.js'
 import TronGrid from './components/TronGrid.vue'
 import QuadDiagram from './components/QuadDiagram.vue'
 import ComponentPanel from './components/ComponentPanel.vue'
@@ -67,11 +66,27 @@ import UrlImportModal from './components/UrlImportModal.vue'
 import HelpModal from './components/HelpModal.vue'
 
 const store = useBuildStore()
+const { loadBuildFromUrl } = useStorage()
+
+onMounted(() => {
+  if (window.location.hash.includes('#build=')) {
+    const loaded = loadBuildFromUrl(window.location.hash)
+    if (loaded) history.replaceState(null, '', window.location.pathname)
+  }
+})
+
 const showSaveLoad = ref(false)
 const showSettings = ref(false)
 const showUrlImport = ref(false)
 const showHelp = ref(false)
 
+const mq = window.matchMedia('(max-width: 768px)')
+const isMobile = ref(mq.matches)
+function onMqChange(e) { isMobile.value = e.matches }
+mq.addEventListener('change', onMqChange)
+onUnmounted(() => mq.removeEventListener('change', onMqChange))
+
+provide('isMobile', isMobile)
 provide('openSettings', () => { showSettings.value = true })
 </script>
 
@@ -119,20 +134,64 @@ provide('openSettings', () => { showSettings.value = true })
   margin-top: 1px;
 }
 
-.credits {
+.bottom-info {
   position: absolute;
   bottom: 8px;
   left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  pointer-events: none;
+}
+.credits {
   font-size: 11px;
   color: rgba(0, 240, 255, 0.3);
   font-family: 'Share Tech Mono', monospace;
   letter-spacing: 0.5px;
-  z-index: 10;
   pointer-events: auto;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 .credits:hover {
   color: rgba(0, 240, 255, 0.6);
+}
+.disclaimer {
+  font-size: 9px;
+  color: rgba(197, 208, 224, 0.25);
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.3px;
+  pointer-events: none;
+}
+
+/* Mobile layout */
+.app-root.mobile {
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: auto;
+  min-height: 100vh;
+}
+.app-root.mobile .top-bar {
+  position: sticky;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+}
+.app-root.mobile .diagram-area {
+  position: relative;
+  top: auto;
+  min-height: 60vh;
+  padding: 10px;
+}
+.app-root.mobile .bottom-info {
+  position: relative;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+  padding: 12px;
+  bottom: auto;
+  left: auto;
+  right: auto;
 }
 </style>

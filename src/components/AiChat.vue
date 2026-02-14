@@ -77,10 +77,18 @@
 </template>
 
 <script setup>
-import { ref, nextTick, watch, computed } from 'vue'
+import { ref, nextTick, watch, computed, inject } from 'vue'
 import { useAi } from '../composables/useAi.js'
 
-const { messages, loading, error, sendMessage, clearChat } = useAi()
+const { messages, loading, error, needsApiKey, sendMessage, clearChat } = useAi()
+const openSettings = inject('openSettings', null)
+
+watch(needsApiKey, (val) => {
+  if (val) {
+    openSettings?.()
+    needsApiKey.value = false
+  }
+})
 
 const isOpen = ref(false)
 const input = ref('')

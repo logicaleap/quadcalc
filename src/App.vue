@@ -53,7 +53,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, provide } from 'vue'
 import { useBuildStore } from './stores/buildStore.js'
 import TronGrid from './components/TronGrid.vue'
 import QuadDiagram from './components/QuadDiagram.vue'
@@ -71,6 +71,8 @@ const showSaveLoad = ref(false)
 const showSettings = ref(false)
 const showUrlImport = ref(false)
 const showHelp = ref(false)
+
+provide('openSettings', () => { showSettings.value = true })
 </script>
 
 <style scoped>

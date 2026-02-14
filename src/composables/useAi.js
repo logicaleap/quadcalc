@@ -166,25 +166,35 @@ function executeToolCall(toolCall, store) {
 }
 
 // Parse Gemini-style tool_code blocks from text content
-// e.g. "```tool_code\nprint(default_api.search_presets(category="frame", query="5"))\n```"
+// Handles: ```tool_code\n...\n```, `tool_code\n...\n`, bare default_api.fn() calls
 function parseInlineToolCalls(text) {
   const calls = []
-  // Match tool_code blocks or bare function calls
-  const codeBlockPattern = /```(?:tool_code|python)?\s*\n?([\s\S]*?)```/g
   let match
-  while ((match = codeBlockPattern.exec(text)) !== null) {
-    const code = match[1].trim()
-    const fnCalls = extractFunctionCalls(code)
-    calls.push(...fnCalls)
+
+  // 1. Triple-backtick code blocks (```tool_code ... ```)
+  const triplePattern = /```(?:tool_code|python)?\s*\n?([\s\S]*?)```/g
+  while ((match = triplePattern.exec(text)) !== null) {
+    calls.push(...extractFunctionCalls(match[1].trim()))
   }
-  // Also try bare print(...) calls without code blocks
+
+  // 2. Single-backtick blocks (`tool_code ... `) — some models do this
   if (calls.length === 0) {
-    const barePattern = /(?:print\()?default_api\.(\w+)\(([^)]*)\)\)?/g
+    const singlePattern = /`(?:tool_code|python)?\s*\n?([\s\S]*?)`/g
+    while ((match = singlePattern.exec(text)) !== null) {
+      const fnCalls = extractFunctionCalls(match[1].trim())
+      if (fnCalls.length > 0) calls.push(...fnCalls)
+    }
+  }
+
+  // 3. Bare function calls without any code blocks
+  if (calls.length === 0) {
+    const barePattern = /(?:print\()?(?:default_api\.)?(\w+)\(([^)]*)\)\)?/g
     while ((match = barePattern.exec(text)) !== null) {
       const parsed = parseFnCall(match[1], match[2])
       if (parsed) calls.push(parsed)
     }
   }
+
   return calls
 }
 
@@ -203,9 +213,9 @@ function parseFnCall(fnName, argsStr) {
   const validFns = ['search_presets', 'set_component', 'remove_component']
   if (!validFns.includes(fnName)) return null
 
-  // Parse Python-style keyword args: category="frame", query="5 inch"
+  // Parse Python-style keyword args: category="frame" or category='frame'
   const args = {}
-  const argPattern = /(\w+)\s*=\s*"([^"]*)"/g
+  const argPattern = /(\w+)\s*=\s*["']([^"']*)["']/g
   let m
   while ((m = argPattern.exec(argsStr)) !== null) {
     args[m[1]] = m[2]
@@ -224,7 +234,13 @@ function parseFnCall(fnName, argsStr) {
 function cleanToolCodeFromText(text) {
   return text
     .replace(/```(?:tool_code|python)?\s*\n?[\s\S]*?```/g, '')
-    .replace(/(?:print\()?default_api\.\w+\([^)]*\)\)?/g, '')
+    .replace(/`(?:tool_code|python)\s*\n?[\s\S]*?`/g, '')
+    .replace(/(?:print\()?(?:default_api\.)?\w+\([^)]*\)\)?/g, (match) => {
+      // Only strip if it looks like a tool call, not regular text
+      const fnPattern = /(?:search_presets|set_component|remove_component)/
+      return fnPattern.test(match) ? '' : match
+    })
+    .replace(/\n{3,}/g, '\n\n')
     .trim()
 }
 
@@ -232,6 +248,7 @@ export function useAi() {
   const messages = ref([])
   const loading = ref(false)
   const error = ref(null)
+  const needsApiKey = ref(false)
 
   function buildContext() {
     const store = useBuildStore()
@@ -280,7 +297,7 @@ export function useAi() {
     const settings = getSettings()
 
     if (!settings.apiKey) {
-      error.value = 'Please set your OpenRouter API key in Settings.'
+      needsApiKey.value = true
       return
     }
 
@@ -290,13 +307,17 @@ export function useAi() {
 
     const systemPrompt = `You are QuadCalc AI, an expert FPV drone building assistant. You help users pick compatible components for their quadcopter builds.
 
-You have tools to search the component database and directly modify the user's build. USE THEM when the user asks you to add, change, or suggest components. Don't just describe components — actually search for them and assign them.
+You have tools to search the component database and directly modify the user's build.
 
-IMPORTANT: Use the provided tool functions directly. Do NOT write code or use print() statements. Just call the functions.
+CRITICAL RULES:
+1. ALWAYS use the tool functions to search and add components. Never say "I can't find it" without calling search_presets first.
+2. When the user confirms they want a component (e.g. "yes", "add it", "go ahead"), ALWAYS call search_presets to find the preset ID, then call set_component. Do NOT rely on memory — always search fresh.
+3. Do NOT write code, use print(), or wrap calls in backticks. Just call the tool functions directly.
+4. When suggesting components, search first, then present options from the actual results.
 
 When a user asks to "add a motor" or "set up a 5 inch build", use search_presets to find options, then use set_component to assign the best match (or ask the user to choose if there are multiple good options).
 
-When a user asks to "populate all parts", "build me a fast quad", "set up a cinematic drone", or similar broad requests, you should search and assign ALL relevant components (frame, motors, propellers, battery, FC, ESC, VTX, camera, RX, TX, goggles) using multiple tool calls. Pick components that work well together for the requested style.
+When a user asks to "populate all parts", "build me a fast quad", "set up a cinematic drone", or similar broad requests, search and assign ALL relevant components (frame, motors, propellers, battery, FC, ESC, VTX, camera, RX, TX, goggles) using multiple tool calls. Pick components that work well together for the requested style.
 
 You know about:
 - Frame sizes (3", 5", 7") and which components match
@@ -305,9 +326,8 @@ You know about:
 - Video systems (Analog, DJI, HDZero, Walksnail) — camera, VTX, and goggles must match
 - Radio protocols (ELRS, Crossfire, FrSky, FlySky) — TX and RX must match
 - Flight controllers, ESCs, mounting patterns, and voltage ratings
-- General FPV building best practices
 
-Be concise but thorough. If you see compatibility issues, explain WHY they're problems and suggest fixes. Assume the user may be a beginner and explain jargon when used.`
+Be concise but thorough. If you see compatibility issues, explain WHY they're problems and suggest fixes.`
 
     // Build conversation history — keep last 6 messages (≈3 turns) to control cost
     const recentHistory = messages.value.slice(0, -1)
@@ -442,6 +462,7 @@ Be concise but thorough. If you see compatibility issues, explain WHY they're pr
     messages,
     loading,
     error,
+    needsApiKey,
     sendMessage,
     clearChat,
     HELP_TEXT,

@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { CATEGORIES } from '../utils/helpers.js'
 
+const DRAFTS_KEY = 'quadcalc_drafts'
+const MAX_DRAFTS = 5
+
 function emptyBuild() {
   const components = {}
   CATEGORIES.forEach(c => { components[c.key] = null })
@@ -10,6 +13,31 @@ function emptyBuild() {
 
 function snapshotComponents(comps) {
   return JSON.parse(JSON.stringify(comps))
+}
+
+function saveDraft(name, comps) {
+  try {
+    const raw = localStorage.getItem(DRAFTS_KEY)
+    const drafts = raw ? JSON.parse(raw) : []
+    drafts.push({
+      name,
+      timestamp: Date.now(),
+      components: snapshotComponents(comps),
+    })
+    // Keep only last MAX_DRAFTS
+    while (drafts.length > MAX_DRAFTS) drafts.shift()
+    localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts))
+  } catch { /* localStorage full or unavailable */ }
+}
+
+function loadLatestDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFTS_KEY)
+    const drafts = raw ? JSON.parse(raw) : []
+    return drafts.length > 0 ? drafts[drafts.length - 1] : null
+  } catch {
+    return null
+  }
 }
 
 export const useBuildStore = defineStore('build', () => {
@@ -110,6 +138,29 @@ export const useBuildStore = defineStore('build', () => {
       name: buildName.value,
       timestamp: Date.now(),
       components: { ...components.value },
+    }
+  }
+
+  // Auto-save draft on every component change (debounced)
+  let draftTimer = null
+  watch(components, () => {
+    if (skipSnapshot) return
+    clearTimeout(draftTimer)
+    draftTimer = setTimeout(() => {
+      const hasAny = Object.values(components.value).some(Boolean)
+      if (hasAny) saveDraft(buildName.value, components.value)
+    }, 1000)
+  }, { deep: true })
+
+  // Restore latest draft on startup if build is empty
+  const hasComponents = Object.values(components.value).some(Boolean)
+  if (!hasComponents) {
+    const draft = loadLatestDraft()
+    if (draft && draft.components) {
+      buildName.value = draft.name || 'Untitled Build'
+      Object.keys(components.value).forEach(k => {
+        components.value[k] = draft.components[k] || null
+      })
     }
   }
 

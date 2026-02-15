@@ -96,23 +96,49 @@ const HELP_TEXT = `**QuadCalc AI** can help you build your FPV drone. Here's wha
 \`Difference between 4S and 6S?\`
 \`What is ELRS?\``
 
-function searchPresets(category, query) {
+function searchPresets(category, query, extraFilters) {
   const items = presets[category]
   if (!items) return { error: `Unknown category: ${category}`, count: 0, results: [] }
 
-  if (!query) {
-    return {
-      count: items.length,
-      results: items.slice(0, 10).map(summarizePreset),
-    }
+  let matches = items
+
+  // Text search via query
+  if (query) {
+    const q = query.toLowerCase()
+    matches = matches.filter(item =>
+      item.name.toLowerCase().includes(q) ||
+      item.description?.toLowerCase().includes(q) ||
+      Object.values(item.specs || {}).some(v => String(v).toLowerCase().includes(q))
+    )
   }
 
-  const q = query.toLowerCase()
-  const matches = items.filter(item =>
-    item.name.toLowerCase().includes(q) ||
-    item.description?.toLowerCase().includes(q) ||
-    Object.values(item.specs || {}).some(v => String(v).toLowerCase().includes(q))
-  )
+  // Filter by any extra params the model passes (size, kv, voltage, etc.)
+  // These match against preset specs — supports exact match and range strings like "1700-2000"
+  if (extraFilters && Object.keys(extraFilters).length > 0) {
+    matches = matches.filter(item => {
+      const specs = item.specs || {}
+      for (const [key, filterVal] of Object.entries(extraFilters)) {
+        const specVal = specs[key]
+        if (specVal == null) continue
+        const specStr = String(specVal).toLowerCase()
+        const filterStr = String(filterVal).toLowerCase()
+
+        // Range filter: "1700-2000" or "2205-2407"
+        const rangeMatch = filterStr.match(/^(\d+)\s*-\s*(\d+)$/)
+        if (rangeMatch) {
+          const lo = parseInt(rangeMatch[1])
+          const hi = parseInt(rangeMatch[2])
+          const num = parseInt(specStr)
+          if (!isNaN(num) && (num < lo || num > hi)) return false
+          continue
+        }
+
+        // Exact/substring match
+        if (!specStr.includes(filterStr)) return false
+      }
+      return true
+    })
+  }
 
   return {
     count: matches.length,
@@ -138,7 +164,8 @@ function executeToolCall(toolCall, store) {
     const fnName = toolCall.function.name
 
     if (fnName === 'search_presets') {
-      return searchPresets(args.category, args.query)
+      const { category, query, ...extra } = args
+      return searchPresets(category, query, extra)
     }
 
     if (fnName === 'set_component') {
@@ -186,7 +213,21 @@ function parseInlineToolCalls(text) {
     }
   }
 
-  // 3. Bare function calls without any code blocks
+  // 3. Function name followed by JSON object: search_presets{"category": "motors"}
+  if (calls.length === 0) {
+    const jsonPattern = /(search_presets|set_component|remove_component)\s*(\{[^}]+\})/g
+    while ((match = jsonPattern.exec(text)) !== null) {
+      try {
+        const args = JSON.parse(match[2])
+        calls.push({
+          id: `inline_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+          function: { name: match[1], arguments: JSON.stringify(args) },
+        })
+      } catch {}
+    }
+  }
+
+  // 4. Bare function calls without any code blocks
   if (calls.length === 0) {
     const barePattern = /(?:print\()?(?:default_api\.)?(\w+)\(([^)]*)\)\)?/g
     while ((match = barePattern.exec(text)) !== null) {
@@ -235,6 +276,7 @@ function cleanToolCodeFromText(text) {
   return text
     .replace(/```(?:tool_code|python)?\s*\n?[\s\S]*?```/g, '')
     .replace(/`(?:tool_code|python)\s*\n?[\s\S]*?`/g, '')
+    .replace(/(?:search_presets|set_component|remove_component)\s*\{[^}]+\}/g, '')
     .replace(/(?:print\()?(?:default_api\.)?\w+\([^)]*\)\)?/g, (match) => {
       // Only strip if it looks like a tool call, not regular text
       const fnPattern = /(?:search_presets|set_component|remove_component)/

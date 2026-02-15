@@ -374,9 +374,10 @@ export const compatibilityRules = [
       if (!vtx.specs?.connector || !antenna.specs?.connector) return null
       const vtxConn = vtx.specs.connector
       const antConn = antenna.specs.connector
-      if (vtxConn === antConn) return null
-      const smaFamily = new Set(['SMA', 'RP-SMA'])
-      if (smaFamily.has(vtxConn) && smaFamily.has(antConn))
+      const normConn = (s) => s.replace(/[.\-\s]/g, '').toUpperCase()
+      if (normConn(vtxConn) === normConn(antConn)) return null
+      const smaFamily = new Set(['SMA', 'RPSMA'])
+      if (smaFamily.has(normConn(vtxConn)) && smaFamily.has(normConn(antConn)))
         return `VTX has ${vtxConn} but VTX antenna is ${antConn}. You'll need a simple SMA↔RP-SMA adapter — cheap and minimal signal loss.`
       return `VTX has ${vtxConn} but VTX antenna is ${antConn}. You'll need a ${vtxConn}↔${antConn} adapter pigtail, which adds weight and signal loss.`
     },

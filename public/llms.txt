@@ -1,0 +1,34 @@
+# QuadCalc — FPV Drone Build Planner
+
+> An interactive web app for planning FPV drone builds with real component data, compatibility checking, and performance estimates.
+
+QuadCalc helps FPV pilots plan their quadcopter builds by selecting from 1000+ real-world components across 13 categories: frame, motors, propellers, battery, flight controller, ESC, VTX, VTX antenna, camera, receiver, RX antenna, transmitter, and goggles.
+
+## Features
+
+- Interactive SVG wiring diagram showing component connections
+- Real-time compatibility checking (16 rules covering mount patterns, voltage, protocols, connectors)
+- Thrust-to-weight ratio calculation using real motor thrust data
+- Estimated flight time based on battery capacity and motor draw
+- Total cost and weight tracking
+- AI build advisor (via OpenRouter) for component recommendations
+- PWA support for offline use
+- Dark and light themes
+- URL sharing and local storage persistence
+
+## Component Data
+
+All presets use realistic specs from real FPV products. Key data fields:
+- Cost in cents USD (e.g., 3999 = $39.99)
+- Weight in grams
+- Category-specific specs (KV, voltage, mount pattern, protocol, etc.)
+
+## Tech Stack
+
+- Vue 3 + Vite + Pinia + Tailwind CSS v4
+- No backend — fully client-side SPA
+- AI features require an OpenRouter API key (user-provided, stored in localStorage)
+
+## URL
+
+https://quadcalc.shamir.com.au/

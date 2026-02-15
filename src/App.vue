@@ -47,6 +47,7 @@
     <!-- Credits & Disclaimer -->
     <div class="bottom-info">
       <a href="mailto:contact@shamir.com.au" class="credits">Built by Asaf Shamir · contact@shamir.com.au</a>
+      <span class="version-tag">v{{ appVersion }}</span>
       <span class="disclaimer">Compatibility data is provided as guidance only. Always verify component specifications before purchasing.</span>
     </div>
 
@@ -90,6 +91,8 @@ const showSaveLoad = ref(false)
 const showSettings = ref(false)
 const showUrlImport = ref(false)
 const showHelp = ref(false)
+
+const appVersion = __APP_VERSION__
 
 const mq = window.matchMedia('(max-width: 768px)')
 const isMobile = ref(mq.matches)
@@ -174,6 +177,13 @@ provide('openSettings', () => { showSettings.value = true })
 }
 .credits:hover {
   color: var(--qc-cyan-05);
+}
+.version-tag {
+  font-size: 9px;
+  color: var(--qc-text-faint);
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+  pointer-events: none;
 }
 .disclaimer {
   font-size: 9px;

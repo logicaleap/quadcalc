@@ -235,6 +235,17 @@ export function useStorage() {
     return component
   }
 
+  function updateCustomPreset(category, componentId, updates) {
+    const all = getCustomPresets()
+    const list = all[category]
+    if (!list) return
+    const idx = list.findIndex(p => p.id === componentId)
+    if (idx === -1) return
+    const { id: _id, ...safe } = updates
+    all[category][idx] = { ...all[category][idx], ...safe, _custom: true }
+    localStorage.setItem(CUSTOM_PRESETS_KEY, JSON.stringify(all))
+  }
+
   function deleteCustomPreset(category, componentId) {
     const presets = getCustomPresets()
     if (presets[category]) {
@@ -262,6 +273,7 @@ export function useStorage() {
     saveSettings,
     getCustomPresets,
     saveCustomPreset,
+    updateCustomPreset,
     deleteCustomPreset,
   }
 }

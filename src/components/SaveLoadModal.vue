@@ -148,7 +148,7 @@ function handleLoadTemplate(tpl) {
   }
   store.loadBuild({ name: tpl.name, components: comps })
   statusMsg.value = `Loaded "${tpl.name}"`
-  setTimeout(() => { statusMsg.value = '' }, 2000)
+  setTimeout(() => { emit('close') }, 600)
 }
 
 function handleSave() {
@@ -162,7 +162,7 @@ function handleSave() {
 function handleLoad(id) {
   loadBuild(id)
   statusMsg.value = 'Build loaded'
-  setTimeout(() => { statusMsg.value = '' }, 2000)
+  setTimeout(() => { emit('close') }, 600)
 }
 
 function handleDelete(id) {

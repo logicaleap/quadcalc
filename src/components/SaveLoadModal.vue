@@ -95,8 +95,19 @@
             </div>
           </div>
 
+          <!-- Confirm load prompt -->
+          <Transition name="modal">
+            <div v-if="confirmAction" class="mt-3 p-3 border border-amber-500/40 bg-amber-500/5 text-center animate-fade-in">
+              <div class="text-xs text-amber-400 mb-2">Current build has unsaved changes that will be lost.</div>
+              <div class="flex justify-center gap-2">
+                <button class="tron-btn text-[10px] px-3 py-1" @click="cancelConfirm">CANCEL</button>
+                <button class="tron-btn-danger tron-btn text-[10px] px-3 py-1" @click="executeConfirm">LOAD ANYWAY</button>
+              </div>
+            </div>
+          </Transition>
+
           <!-- Status message -->
-          <div v-if="statusMsg" class="mt-3 text-xs text-tron-green text-center animate-fade-in">
+          <div v-if="statusMsg && !confirmAction" class="mt-3 text-xs text-tron-green text-center animate-fade-in">
             {{ statusMsg }}
           </div>
         </div>
@@ -130,25 +141,47 @@ const saveName = ref('')
 const statusMsg = ref('')
 const shoppingCopied = ref(false)
 const shareCopied = ref(false)
+const confirmAction = ref(null)
 
 watch(() => props.show, (val) => {
   if (val) {
     loadSavedBuilds()
     saveName.value = store.buildName
     statusMsg.value = ''
+    confirmAction.value = null
   }
 })
 
-function handleLoadTemplate(tpl) {
-  const comps = {}
-  for (const [cat, presetId] of Object.entries(tpl.presetIds)) {
-    const list = presets[cat] || []
-    const found = list.find(p => p.id === presetId)
-    if (found) comps[cat] = { ...found, category: cat }
+function confirmIfNeeded(action) {
+  if (store.filledCount > 0) {
+    confirmAction.value = action
+  } else {
+    action()
   }
-  store.loadBuild({ name: tpl.name, components: comps })
-  statusMsg.value = `Loaded "${tpl.name}"`
-  setTimeout(() => { emit('close') }, 600)
+}
+
+function executeConfirm() {
+  const action = confirmAction.value
+  confirmAction.value = null
+  if (action) action()
+}
+
+function cancelConfirm() {
+  confirmAction.value = null
+}
+
+function handleLoadTemplate(tpl) {
+  confirmIfNeeded(() => {
+    const comps = {}
+    for (const [cat, presetId] of Object.entries(tpl.presetIds)) {
+      const list = presets[cat] || []
+      const found = list.find(p => p.id === presetId)
+      if (found) comps[cat] = { ...found, category: cat }
+    }
+    store.loadBuild({ name: tpl.name, components: comps })
+    statusMsg.value = `Loaded "${tpl.name}"`
+    setTimeout(() => { emit('close') }, 600)
+  })
 }
 
 function handleSave() {
@@ -160,9 +193,11 @@ function handleSave() {
 }
 
 function handleLoad(id) {
-  loadBuild(id)
-  statusMsg.value = 'Build loaded'
-  setTimeout(() => { emit('close') }, 600)
+  confirmIfNeeded(() => {
+    loadBuild(id)
+    statusMsg.value = 'Build loaded'
+    setTimeout(() => { emit('close') }, 600)
+  })
 }
 
 function handleDelete(id) {

@@ -281,20 +281,14 @@ function clearSlot() {
   right: 0;
   left: 0;
   bottom: 0;
-  top: auto;
+  top: 0;
   width: 100%;
-  height: 65vh;
-  border-radius: 12px 12px 0 0;
-  border-top: 2px solid var(--qc-cyan-03);
+  height: 100%;
+  border-radius: 0;
+  border-top: none;
 }
 .mobile-panel::before {
-  content: '';
-  display: block;
-  width: 40px;
-  height: 4px;
-  background: var(--qc-cyan-03);
-  border-radius: 2px;
-  margin: 0 auto 8px;
+  display: none;
 }
 
 .slide-enter-active, .slide-leave-active {

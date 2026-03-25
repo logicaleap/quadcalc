@@ -95,21 +95,23 @@
             </div>
           </div>
 
-          <!-- Confirm load prompt -->
-          <Transition name="modal">
-            <div v-if="confirmAction" class="mt-3 p-3 border border-amber-500/40 bg-amber-500/5 text-center animate-fade-in">
-              <div class="text-xs text-amber-400 mb-2">Current build has unsaved changes that will be lost.</div>
-              <div class="flex justify-center gap-2">
-                <button class="tron-btn text-[10px] px-3 py-1" @click="cancelConfirm">CANCEL</button>
-                <button class="tron-btn-danger tron-btn text-[10px] px-3 py-1" @click="executeConfirm">LOAD ANYWAY</button>
-              </div>
-            </div>
-          </Transition>
-
           <!-- Status message -->
           <div v-if="statusMsg && !confirmAction" class="mt-3 text-xs text-tron-green text-center animate-fade-in">
             {{ statusMsg }}
           </div>
+
+          <!-- Confirm load overlay -->
+          <Transition name="confirm">
+            <div v-if="confirmAction" class="confirm-overlay" @click.self="cancelConfirm">
+              <div class="confirm-dialog">
+                <div class="text-xs text-amber-400 mb-3">Current build has unsaved changes that will be lost.</div>
+                <div class="flex justify-center gap-2">
+                  <button class="tron-btn text-[10px] px-3 py-1" @click="cancelConfirm">CANCEL</button>
+                  <button class="tron-btn-danger tron-btn text-[10px] px-3 py-1" @click="executeConfirm">LOAD ANYWAY</button>
+                </div>
+              </div>
+            </div>
+          </Transition>
         </div>
       </div>
     </Transition>
@@ -287,6 +289,7 @@ function countComponents(build) {
 }
 
 .modal-content {
+  position: relative;
   width: 440px;
   max-width: 90vw;
   max-height: 85vh;
@@ -298,6 +301,34 @@ function countComponents(build) {
   transition: opacity 0.2s ease;
 }
 .modal-enter-from, .modal-leave-to {
+  opacity: 0;
+}
+
+.confirm-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--qc-overlay);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  border-radius: inherit;
+}
+.confirm-dialog {
+  padding: 20px 24px;
+  border: 1px solid color-mix(in srgb, #f59e0b 40%, transparent);
+  background: var(--qc-surface);
+  text-align: center;
+}
+
+.confirm-enter-active {
+  transition: opacity 0.15s ease-out;
+}
+.confirm-leave-active {
+  transition: opacity 0.1s ease-in;
+}
+.confirm-enter-from, .confirm-leave-to {
   opacity: 0;
 }
 </style>

@@ -49,7 +49,7 @@
             <div v-if="showShareMenu" class="share-dropdown tron-panel">
               <button class="share-option" @click="handleShareLink">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                <span>{{ shareFeedback || 'SHARE LINK' }}</span>
+                <span>{{ shareFeedback || shareLabel }}</span>
               </button>
               <button class="share-option" @click="handleShoppingList">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
@@ -119,7 +119,7 @@ import UrlImportModal from './components/UrlImportModal.vue'
 import HelpModal from './components/HelpModal.vue'
 
 const store = useBuildStore()
-const { loadBuildFromUrl, copyShareUrl, copyShoppingList, exportBuildToFile, exportBuildToCsv } = useStorage()
+const { loadBuildFromUrl, generateShareUrl, copyShareUrl, copyShoppingList, exportBuildToFile, exportBuildToCsv } = useStorage()
 const { isDark, initTheme, toggleTheme } = useTheme()
 
 onMounted(() => {
@@ -141,6 +141,7 @@ const showShareMenu = ref(false)
 const shareWrapperRef = ref(null)
 const shareFeedback = ref('')
 const shoppingFeedback = ref('')
+const shareLabel = navigator.share ? 'SHARE' : 'COPY LINK'
 
 function closeShareOnClickOutside(e) {
   if (showShareMenu.value && shareWrapperRef.value && !shareWrapperRef.value.contains(e.target)) {
@@ -149,9 +150,19 @@ function closeShareOnClickOutside(e) {
 }
 
 async function handleShareLink() {
-  await copyShareUrl()
-  shareFeedback.value = 'COPIED!'
-  setTimeout(() => { shareFeedback.value = ''; showShareMenu.value = false }, 1200)
+  const url = generateShareUrl()
+  if (navigator.share) {
+    showShareMenu.value = false
+    try {
+      await navigator.share({ title: store.buildName, url })
+    } catch {
+      // User cancelled the share sheet — no action needed
+    }
+  } else {
+    await navigator.clipboard.writeText(url)
+    shareFeedback.value = 'COPIED!'
+    setTimeout(() => { shareFeedback.value = ''; showShareMenu.value = false }, 1200)
+  }
 }
 
 async function handleShoppingList() {

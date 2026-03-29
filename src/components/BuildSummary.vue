@@ -12,8 +12,8 @@
     <div class="flex items-center gap-3">
       <!-- Undo/Redo -->
       <div class="flex items-center gap-1 mr-1">
-        <button class="undo-btn tron-btn" :disabled="!store.canUndo" @click="store.undo()" title="Undo">&#x21A9;</button>
-        <button class="undo-btn tron-btn" :disabled="!store.canRedo" @click="store.redo()" title="Redo">&#x21AA;</button>
+        <button class="undo-btn tron-btn" :disabled="!store.canUndo" @click="store.undo()" title="Undo (Ctrl+Z)">&#x21A9;</button>
+        <button class="undo-btn tron-btn" :disabled="!store.canRedo" @click="store.redo()" title="Redo (Ctrl+Shift+Z)">&#x21AA;</button>
       </div>
 
       <!-- Compat Score -->
@@ -40,15 +40,18 @@
         <div class="stat-label">WEIGHT {{ showBreakdown ? '▼' : '▶' }}</div>
       </div>
 
-      <!-- TWR -->
-      <div v-if="store.thrustToWeightRatio != null" class="stat-block" :class="twrClass">
+      <!-- TWR (always visible) -->
+      <div class="stat-block" :class="twrClass" :title="twrTooltip">
         <div class="stat-value">{{ formattedTWR }}</div>
-        <div class="stat-label">TWR</div>
+        <div class="stat-label">
+          TWR
+          <span v-if="twrTag" class="stat-tag" :class="twrClass">{{ twrTag }}</span>
+        </div>
       </div>
 
-      <!-- Flight Time -->
-      <div v-if="store.estimatedFlightTime != null" class="stat-block">
-        <div class="stat-value text-tron-text-bright">~{{ Math.round(store.estimatedFlightTime) }} min</div>
+      <!-- Flight Time (always visible) -->
+      <div class="stat-block" :title="flightTooltip">
+        <div class="stat-value text-tron-text-bright">{{ formattedFlightTime }}</div>
         <div class="stat-label">FLIGHT</div>
       </div>
     </div>
@@ -77,6 +80,13 @@
         </div>
       </div>
     </Transition>
+
+    <!-- 14/14 Celebration -->
+    <Transition name="expand">
+      <div v-if="store.filledCount >= requiredSlots" class="celebration-bar">
+        <span class="celebration-text">BUILD COMPLETE</span>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -90,9 +100,11 @@ const store = useBuildStore()
 const { compatibilityScore } = useCompatibility()
 
 const totalSlots = CATEGORIES.length
+const requiredSlots = CATEGORIES.filter(c => c.key !== 'other').length
 const formattedCost = computed(() => formatCurrency(store.totalCost))
 const formattedWeight = computed(() => formatWeight(store.totalWeight))
-const formattedTWR = computed(() => formatTWR(store.thrustToWeightRatio))
+const formattedTWR = computed(() => store.thrustToWeightRatio != null ? formatTWR(store.thrustToWeightRatio) : '—')
+const formattedFlightTime = computed(() => store.estimatedFlightTime != null ? `~${Math.round(store.estimatedFlightTime)} min` : '—')
 const showBreakdown = ref(false)
 
 const scoreClass = computed(() => {
@@ -107,6 +119,26 @@ const twrClass = computed(() => {
   if (r >= 4) return 'twr-good'
   if (r >= 2) return 'twr-warn'
   return 'twr-bad'
+})
+
+const twrTag = computed(() => {
+  const r = store.thrustToWeightRatio
+  if (r == null) return ''
+  if (r >= 8) return 'RACE'
+  if (r >= 5) return 'FREESTYLE'
+  if (r >= 3) return 'CRUISE'
+  if (r >= 2) return 'HEAVY'
+  return 'LOW'
+})
+
+const twrTooltip = computed(() => {
+  if (store.thrustToWeightRatio == null) return 'Add motors + battery to calculate thrust-to-weight ratio'
+  return `Thrust-to-weight ratio: ${store.thrustToWeightRatio.toFixed(1)}:1`
+})
+
+const flightTooltip = computed(() => {
+  if (store.estimatedFlightTime == null) return 'Add motors + battery to estimate flight time'
+  return `Estimated flight time: ~${Math.round(store.estimatedFlightTime)} minutes`
 })
 
 const CATEGORY_COLORS = {
@@ -202,6 +234,19 @@ const breakdownSegments = computed(() => {
   font-family: 'Share Tech Mono', monospace;
   color: var(--qc-text-muted);
   letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.stat-tag {
+  font-size: 8px;
+  padding: 0 3px;
+  letter-spacing: 0.5px;
+  border: 1px solid currentColor;
+  opacity: 0.7;
+  line-height: 1.4;
 }
 
 .score-good .stat-value { color: var(--color-tron-green); }
@@ -209,8 +254,11 @@ const breakdownSegments = computed(() => {
 .score-bad .stat-value { color: var(--color-tron-red); }
 
 .twr-good .stat-value { color: var(--color-tron-green); }
+.twr-good .stat-tag { color: var(--color-tron-green); }
 .twr-warn .stat-value { color: var(--color-tron-yellow); }
+.twr-warn .stat-tag { color: var(--color-tron-yellow); }
 .twr-bad .stat-value { color: var(--color-tron-red); }
+.twr-bad .stat-tag { color: var(--color-tron-red); }
 
 .undo-btn {
   width: 28px;
@@ -267,6 +315,29 @@ const breakdownSegments = computed(() => {
   height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.celebration-bar {
+  margin-top: 8px;
+  padding: 4px 16px;
+  border: 1px solid var(--qc-green-03);
+  background: var(--qc-green-006);
+  text-align: center;
+  animation: celebration-glow 2s ease-in-out infinite;
+}
+
+.celebration-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--color-tron-green);
+  letter-spacing: 3px;
+  text-shadow: var(--qc-glow-text-green);
+}
+
+@keyframes celebration-glow {
+  0%, 100% { box-shadow: 0 0 8px var(--qc-green-015); }
+  50% { box-shadow: 0 0 16px var(--qc-green-03), 0 0 32px var(--qc-green-008); }
 }
 
 @media (max-width: 768px) {

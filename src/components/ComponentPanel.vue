@@ -86,6 +86,7 @@
         class="flex-1 min-h-0"
         :items="displayItems"
         :selected="currentComponent"
+        :category="store.selectedCategory"
         @select="selectComponent"
       />
     </div>

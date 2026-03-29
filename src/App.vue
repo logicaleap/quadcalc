@@ -76,6 +76,33 @@
     <!-- Main diagram area -->
     <main class="diagram-area">
       <QuadDiagram />
+
+      <!-- Empty-state onboarding overlay -->
+      <Transition name="onboarding-fade">
+        <div v-if="store.filledCount === 0 && !store.selectedCategory" class="onboarding-overlay">
+          <div class="onboarding-card tron-panel">
+            <div class="onboarding-header">
+              <h2 class="onboarding-title">BUILD YOUR QUAD</h2>
+              <p class="onboarding-subtitle">Click any component on the diagram to start picking parts</p>
+            </div>
+            <div class="onboarding-divider"></div>
+            <div class="onboarding-starter-section">
+              <span class="onboarding-or-label">OR LOAD A STARTER BUILD</span>
+              <div class="onboarding-starter-grid">
+                <button
+                  v-for="tpl in starterTemplates"
+                  :key="tpl.id"
+                  class="onboarding-starter-btn"
+                  @click="loadStarterBuild(tpl)"
+                >
+                  <span class="starter-icon">{{ tpl.icon }}</span>
+                  <span class="starter-name">{{ tpl.name }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
     </main>
 
     <!-- Component panel (right side) -->
@@ -103,10 +130,12 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted, onUnmounted } from 'vue'
+import { ref, provide, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useBuildStore } from './stores/buildStore.js'
 import { useStorage } from './composables/useStorage.js'
 import { useTheme } from './composables/useTheme.js'
+import { templates } from './data/templates.js'
+import { presets } from './data/presets.js'
 import TronGrid from './components/TronGrid.vue'
 import QuadDiagram from './components/QuadDiagram.vue'
 import ComponentPanel from './components/ComponentPanel.vue'
@@ -182,6 +211,27 @@ function handleExportCsv() {
 }
 
 const appVersion = __APP_VERSION__
+
+// Onboarding — starter build icons and loading
+const starterIcons = { 'tpl-budget-5': '5"', 'tpl-premium-5': 'HD', 'tpl-cinewhoop-3': '3"', 'tpl-longrange-7': '7"', 'tpl-tinywhoop': 'TW' }
+const starterTemplates = templates.map(t => ({ ...t, icon: starterIcons[t.id] || '?' }))
+
+function loadStarterBuild(tpl) {
+  const comps = {}
+  for (const [cat, presetId] of Object.entries(tpl.presetIds)) {
+    const list = presets[cat] || []
+    const found = list.find(p => p.id === presetId)
+    if (found) comps[cat] = { ...found, category: cat }
+  }
+  store.loadBuild({ name: tpl.name, components: comps })
+}
+
+// Dynamic document title
+watch(() => store.buildName, (name) => {
+  document.title = name && name !== 'Untitled Build'
+    ? `${name} — QuadCalc`
+    : 'QuadCalc — FPV Drone Build Planner'
+}, { immediate: true })
 
 const mq = window.matchMedia('(max-width: 768px)')
 const isMobile = ref(mq.matches)
@@ -353,6 +403,109 @@ provide('openSettings', () => { showSettings.value = true })
 .dropdown-leave-to {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+/* Onboarding overlay */
+.onboarding-overlay {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  pointer-events: auto;
+}
+.onboarding-card {
+  padding: 16px 24px;
+  text-align: center;
+  max-width: 520px;
+  border: 1px solid var(--qc-cyan-03);
+  box-shadow: var(--qc-glow-cyan), 0 4px 24px rgba(0,0,0,0.3);
+}
+.onboarding-header {
+  margin-bottom: 12px;
+}
+.onboarding-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--qc-cyan);
+  letter-spacing: 2px;
+  text-shadow: var(--qc-glow-text-cyan);
+  margin: 0 0 6px 0;
+}
+.onboarding-subtitle {
+  font-size: 12px;
+  color: var(--qc-text);
+  font-family: 'Rajdhani', sans-serif;
+  margin: 0;
+  opacity: 0.7;
+}
+.onboarding-divider {
+  height: 1px;
+  background: var(--qc-cyan-015);
+  margin: 0 0 12px 0;
+}
+.onboarding-or-label {
+  display: block;
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--qc-text-muted);
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+}
+.onboarding-starter-grid {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.onboarding-starter-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--qc-cyan-005);
+  border: 1px solid var(--qc-cyan-02);
+  color: var(--qc-cyan);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 72px;
+}
+.onboarding-starter-btn:hover {
+  background: var(--qc-cyan-015);
+  border-color: var(--qc-cyan);
+  box-shadow: var(--qc-glow-cyan);
+  transform: translateY(-1px);
+}
+.starter-icon {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+.starter-name {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--qc-text);
+}
+
+/* Onboarding fade transition */
+.onboarding-fade-enter-active {
+  transition: all 0.4s ease-out;
+}
+.onboarding-fade-leave-active {
+  transition: all 0.25s ease-in;
+}
+.onboarding-fade-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) translateY(12px);
+}
+.onboarding-fade-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(8px);
 }
 
 /* Mobile layout */

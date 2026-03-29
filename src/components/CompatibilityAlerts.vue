@@ -1,6 +1,6 @@
 <template>
   <div v-if="alerts.length > 0 || activeHints.length > 0" class="compat-alerts">
-    <div class="alerts-header" @click="expanded = !expanded">
+    <div v-if="alerts.length > 0" class="alerts-header" @click="expanded = !expanded">
       <div class="flex items-center gap-2">
         <span v-if="errors.length" class="text-tron-red font-bold text-xs">{{ errors.length }} ERROR{{ errors.length > 1 ? 'S' : '' }}</span>
         <span v-if="warnings.length" class="text-tron-yellow font-bold text-xs">{{ warnings.length }} WARN</span>
@@ -10,7 +10,7 @@
     </div>
 
     <Transition name="expand">
-      <div v-if="expanded" class="alerts-list">
+      <div v-if="expanded && alerts.length > 0" class="alerts-list">
         <div
           v-for="alert in alerts"
           :key="alert.id"

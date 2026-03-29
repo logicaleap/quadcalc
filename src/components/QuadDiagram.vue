@@ -73,6 +73,30 @@
         >RESET?</text>
       </g>
 
+      <!-- "Start here" beacon on Frame node when build is empty -->
+      <g v-if="store.filledCount === 0 && !store.selectedCategory">
+        <circle
+          :cx="effectivePositions[0].x"
+          :cy="effectivePositions[0].y"
+          r="44"
+          fill="none"
+          :stroke="accentColor"
+          stroke-width="1.5"
+          class="beacon-ring"
+          pointer-events="none"
+        />
+        <circle
+          :cx="effectivePositions[0].x"
+          :cy="effectivePositions[0].y"
+          r="52"
+          fill="none"
+          :stroke="accentColor"
+          stroke-width="1"
+          class="beacon-ring beacon-ring-delay"
+          pointer-events="none"
+        />
+      </g>
+
       <!-- Component nodes -->
       <ComponentNode
         v-for="(pos, idx) in effectivePositions"
@@ -85,6 +109,7 @@
         :isSelected="store.selectedCategory === categories[idx].key"
         :isDragging="dragTarget === categories[idx].key"
         :animation="animationState.get(categories[idx].key) || null"
+        :alertCount="getAlertCount(categories[idx].key)"
       />
     </svg>
 
@@ -108,7 +133,7 @@ import { CATEGORIES } from '../utils/helpers.js'
 import ComponentNode from './ComponentNode.vue'
 
 const store = useBuildStore()
-const { getCategoryStatus } = useCompatibility()
+const { getCategoryStatus, alerts } = useCompatibility()
 const { isDark } = useTheme()
 const { getPosition, setPosition, resetPositions, hasOverrides } = useNodePositions()
 const { animationState } = useNodeAnimations()
@@ -259,6 +284,15 @@ function getStatus(key) {
   return getCategoryStatus(key)
 }
 
+function getAlertCount(key) {
+  if (!store.components[key]) return { errors: 0, warnings: 0 }
+  const related = alerts.value.filter(a => a.categories.includes(key))
+  return {
+    errors: related.filter(a => a.severity === 'error').length,
+    warnings: related.filter(a => a.severity === 'warning').length,
+  }
+}
+
 onUnmounted(() => {
   window.removeEventListener('pointermove', onPointerMove)
   window.removeEventListener('pointerup', onPointerUp)
@@ -285,6 +319,21 @@ onUnmounted(() => {
 /* Enable pointer events on the SVG during drag so pointermove reaches it */
 .quad-diagram-svg.dragging {
   pointer-events: auto;
+}
+
+/* Start-here beacon animation */
+.beacon-ring {
+  animation: beacon-pulse 2.4s ease-out infinite;
+  opacity: 0;
+}
+.beacon-ring-delay {
+  animation-delay: 0.6s;
+}
+
+@keyframes beacon-pulse {
+  0%   { r: 36; opacity: 0.6; }
+  70%  { r: 56; opacity: 0; }
+  100% { r: 56; opacity: 0; }
 }
 
 .reset-layout-btn {

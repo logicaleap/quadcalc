@@ -81,6 +81,25 @@
       pointer-events="none"
     >{{ truncatedName }}</text>
 
+    <!-- Alert badge (error/warning count) -->
+    <g v-if="alertCount.errors > 0 || alertCount.warnings > 0" pointer-events="none">
+      <circle
+        :cx="22" :cy="-22"
+        r="9"
+        :fill="alertCount.errors > 0 ? alertBadgeFill.error : alertBadgeFill.warning"
+        :stroke="alertCount.errors > 0 ? alertBadgeStroke.error : alertBadgeStroke.warning"
+        stroke-width="1.5"
+      />
+      <text
+        :x="22" :y="-18"
+        text-anchor="middle"
+        fill="#fff"
+        font-size="10"
+        font-family="Orbitron, sans-serif"
+        font-weight="700"
+      >{{ alertCount.errors > 0 ? '!' : '⚠' }}</text>
+    </g>
+
     <!-- Pulse effect for selected -->
     <circle
       v-if="isSelected"
@@ -132,6 +151,7 @@ const props = defineProps({
   isSelected: { type: Boolean, default: false },
   isDragging: { type: Boolean, default: false },
   animation: { type: Object, default: null },
+  alertCount: { type: Object, default: () => ({ errors: 0, warnings: 0 }) },
 })
 
 const { isDark } = useTheme()
@@ -199,6 +219,15 @@ const lineColor = computed(() => {
   if (props.status === 'ok') return green
   return cyan
 })
+
+const alertBadgeFill = computed(() => ({
+  error: isDark.value ? 'rgba(255,0,60,0.9)' : 'rgba(220,38,38,0.9)',
+  warning: isDark.value ? 'rgba(255,184,0,0.9)' : 'rgba(217,119,6,0.9)',
+}))
+const alertBadgeStroke = computed(() => ({
+  error: isDark.value ? '#ff003c' : '#dc2626',
+  warning: isDark.value ? '#ffb800' : '#d97706',
+}))
 
 const animOverlayColor = computed(() => {
   if (!props.animation) return 'transparent'

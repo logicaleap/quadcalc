@@ -32,7 +32,7 @@ export const CATEGORIES = [
   { key: 'rxAntenna', label: 'RX Antenna', icon: 'antenna' },
   { key: 'tx', label: 'Transmitter (TX)', icon: 'tx' },
   { key: 'goggles', label: 'Goggles', icon: 'goggles' },
-  { key: 'other', label: 'Other', icon: 'other' },
+  { key: 'other', label: 'Accessories', icon: 'other' },
 ]
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.key, c]))

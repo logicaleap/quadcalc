@@ -49,7 +49,6 @@ export const templates = [
       propellers: 'prop-3018-hq',
       battery: 'bat-4s-650',
       fc: 'fc-f405-betafpv',
-      esc: 'esc-hglrc-25a',
       vtx: 'vtx-betafpv-analog',
       camera: 'cam-caddx-ant',
       rx: 'rx-elrs-ep1',

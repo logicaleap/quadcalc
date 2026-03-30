@@ -79,7 +79,7 @@
 
       <!-- Empty-state onboarding overlay -->
       <Transition name="onboarding-fade">
-        <div v-if="store.filledCount === 0 && !store.selectedCategory && !showTour" class="onboarding-overlay">
+        <div v-if="store.filledCount === 0 && !store.selectedCategory && !showTour && !dismissedOnboarding" class="onboarding-overlay">
           <div class="onboarding-card tron-panel">
             <div class="onboarding-header">
               <h2 class="onboarding-title">BUILD YOUR QUAD</h2>
@@ -231,8 +231,10 @@ const appVersion = __APP_VERSION__
 const starterIcons = { 'tpl-budget-5': '5"', 'tpl-premium-5': 'HD', 'tpl-cinewhoop-3': '3"', 'tpl-longrange-7': '7"', 'tpl-tinywhoop': 'TW' }
 const starterTemplates = templates.map(t => ({ ...t, icon: starterIcons[t.id] || '?' }))
 
+const dismissedOnboarding = ref(false)
+
 function startFromScratch() {
-  store.selectedCategory = 'frame'
+  dismissedOnboarding.value = true
 }
 
 function loadStarterBuild(tpl) {

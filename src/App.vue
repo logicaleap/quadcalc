@@ -79,7 +79,7 @@
 
       <!-- Empty-state onboarding overlay -->
       <Transition name="onboarding-fade">
-        <div v-if="store.filledCount === 0 && !store.selectedCategory" class="onboarding-overlay">
+        <div v-if="store.filledCount === 0 && !store.selectedCategory && !showTour" class="onboarding-overlay">
           <div class="onboarding-card tron-panel">
             <div class="onboarding-header">
               <h2 class="onboarding-title">BUILD YOUR QUAD</h2>
@@ -586,16 +586,28 @@ provide('openSettings', () => { showSettings.value = true })
   padding: 10px;
 }
 .app-root.mobile .onboarding-overlay {
-  position: relative;
+  position: fixed;
+  inset: 0;
   bottom: auto;
-  left: auto;
+  left: 0;
+  right: 0;
+  top: 0;
   transform: none;
   width: 100%;
-  padding: 0 8px;
+  height: 100%;
+  padding: 16px 12px;
+  background: var(--qc-overlay);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
 }
 .app-root.mobile .onboarding-card {
   max-width: 100%;
   width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 .app-root.mobile .bottom-info {
   position: relative;

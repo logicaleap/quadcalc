@@ -40,8 +40,8 @@
         <div class="stat-label">WEIGHT {{ showBreakdown ? '▼' : '▶' }}</div>
       </div>
 
-      <!-- TWR (always visible) -->
-      <div class="stat-block" :class="twrClass" :title="twrTooltip">
+      <!-- TWR (always visible on desktop, hidden on mobile when empty) -->
+      <div class="stat-block" :class="[twrClass, { 'hide-mobile-empty': store.thrustToWeightRatio == null }]" :title="twrTooltip">
         <div class="stat-value">{{ formattedTWR }}</div>
         <div class="stat-label">
           TWR
@@ -49,8 +49,8 @@
         </div>
       </div>
 
-      <!-- Flight Time (always visible) -->
-      <div class="stat-block" :title="flightTooltip">
+      <!-- Flight Time (always visible on desktop, hidden on mobile when empty) -->
+      <div class="stat-block" :class="{ 'hide-mobile-empty': store.estimatedFlightTime == null }" :title="flightTooltip">
         <div class="stat-value text-tron-text-bright">{{ formattedFlightTime }}</div>
         <div class="stat-label">FLIGHT</div>
       </div>
@@ -325,6 +325,9 @@ const breakdownSegments = computed(() => {
   }
   .stat-block {
     min-width: 50px;
+  }
+  .stat-block.hide-mobile-empty {
+    display: none;
   }
   .weight-breakdown {
     min-width: 250px;

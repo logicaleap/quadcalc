@@ -323,7 +323,7 @@ onUnmounted(() => {
 
 /* Start-here beacon animation */
 .beacon-ring {
-  animation: beacon-pulse 2.4s ease-out infinite;
+  animation: beacon-pulse 2.4s ease-out 4;
   opacity: 0;
 }
 .beacon-ring-delay {

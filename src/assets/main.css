@@ -352,10 +352,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse-glow 2s ease-in-out 3;
 }
 .animate-dash-flow {
-  animation: dash-flow 1s linear infinite;
+  /* Removed infinite animation — was causing ~90% GPU usage in Firefox.
+     Static dashed lines look fine without the flowing effect. */
 }
 .animate-fade-in {
   animation: fade-in 0.3s ease-out;

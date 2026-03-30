@@ -85,10 +85,16 @@
               <h2 class="onboarding-title">BUILD YOUR QUAD</h2>
               <p class="onboarding-subtitle">Pick a starting point</p>
             </div>
-            <button class="onboarding-scratch-btn" @click="startFromScratch">
-              <span class="scratch-label">Start from Scratch</span>
-              <span class="scratch-hint">Pick each component yourself</span>
-            </button>
+            <div class="onboarding-action-row">
+              <button class="onboarding-scratch-btn" @click="startFromScratch">
+                <span class="scratch-label">Start from Scratch</span>
+                <span class="scratch-hint">Pick each component yourself</span>
+              </button>
+              <button class="onboarding-tour-btn" @click="showTour = true">
+                <span class="scratch-label">Take a Tour</span>
+                <span class="scratch-hint">Learn how QuadCalc works</span>
+              </button>
+            </div>
             <div class="onboarding-divider"></div>
             <div class="onboarding-starter-section">
               <span class="onboarding-or-label">OR LOAD A STARTER BUILD</span>
@@ -130,6 +136,9 @@
     <SettingsModal :show="showSettings" @close="showSettings = false" />
     <UrlImportModal :show="showUrlImport" @close="showUrlImport = false" />
     <HelpModal :show="showHelp" @close="showHelp = false" />
+
+    <!-- Guided Tour -->
+    <GuidedTour :active="showTour" @end="showTour = false" />
   </div>
 </template>
 
@@ -150,6 +159,7 @@ import SaveLoadModal from './components/SaveLoadModal.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import UrlImportModal from './components/UrlImportModal.vue'
 import HelpModal from './components/HelpModal.vue'
+import GuidedTour from './components/GuidedTour.vue'
 
 const store = useBuildStore()
 const { loadBuildFromUrl, generateShareUrl, copyShareUrl, copyShoppingList, exportBuildToFile, exportBuildToCsv } = useStorage()
@@ -168,6 +178,7 @@ const showSaveLoad = ref(false)
 const showSettings = ref(false)
 const showUrlImport = ref(false)
 const showHelp = ref(false)
+const showTour = ref(false)
 
 // Share dropdown
 const showShareMenu = ref(false)
@@ -448,21 +459,27 @@ provide('openSettings', () => { showSettings.value = true })
   margin: 0;
   opacity: 0.7;
 }
-.onboarding-scratch-btn {
+.onboarding-action-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.onboarding-scratch-btn,
+.onboarding-tour-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 2px;
-  width: 100%;
+  flex: 1;
   padding: 10px 16px;
-  margin-bottom: 12px;
   background: var(--qc-cyan-008);
   border: 1px solid var(--qc-cyan-03);
   color: var(--qc-cyan);
   cursor: pointer;
   transition: all 0.2s;
 }
-.onboarding-scratch-btn:hover {
+.onboarding-scratch-btn:hover,
+.onboarding-tour-btn:hover {
   background: var(--qc-cyan-015);
   border-color: var(--qc-cyan);
   box-shadow: var(--qc-glow-cyan);

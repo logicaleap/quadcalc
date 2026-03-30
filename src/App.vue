@@ -7,9 +7,9 @@
       <div class="flex items-center gap-3">
         <div>
           <h1 class="text-tron-cyan text-base font-bold tracking-widest glow-text-cyan">QUADCALC</h1>
-          <span class="browser-storage-note">All data saved locally in your browser</span>
+          <span class="browser-storage-note">FPV BUILD PLANNER</span>
         </div>
-        <span class="text-tron-text/20 text-xs font-mono hidden sm:inline">FPV BUILD PLANNER</span>
+        <span class="text-tron-text/20 text-xs font-mono hidden sm:inline">All data saved locally in your browser</span>
       </div>
       <div class="flex items-center gap-2">
         <button class="theme-toggle tron-btn text-xs" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">

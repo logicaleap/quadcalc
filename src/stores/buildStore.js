@@ -142,10 +142,18 @@ export const useBuildStore = defineStore('build', () => {
   const estimatedFlightTime = computed(() => {
     const battery = components.value.battery
     if (!battery?.specs?.capacity || !totalWeight.value) return null
-    // Estimate average power: ~200W per kg at moderate FPV flying
+    // Scale average power draw by frame class
+    const frameSize = components.value.frame?.specs?.size
+    const s = parseFloat(frameSize) || 5
     const cells = parseInt(battery.specs.voltage) || 4
+    let wattsPerKg
+    if (cells <= 2) wattsPerKg = 300             // Tiny Whoop (1-2S): high throttle % to hover
+    else if (s <= 3.5) wattsPerKg = 300          // 3" Cinewhoop: ducted props need more power
+    else if (s <= 5) wattsPerKg = 350            // 5" Freestyle: punchy throttle
+    else if (s <= 7) wattsPerKg = 180            // 7" Long Range: efficiency cruising
+    else wattsPerKg = 160                        // 10"+ Cinelifter: slow and steady
     const nominalVoltage = cells * 3.7
-    const avgPowerW = (totalWeight.value / 1000) * 200
+    const avgPowerW = (totalWeight.value / 1000) * wattsPerKg
     const avgCurrentA = avgPowerW / nominalVoltage
     // Flight time with 80% usable capacity
     return (battery.specs.capacity * 0.8) / (avgCurrentA * 1000) * 60

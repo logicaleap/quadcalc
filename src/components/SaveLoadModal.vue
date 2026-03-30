@@ -39,7 +39,7 @@
 
           <!-- Clear -->
           <div class="mb-4">
-            <button class="tron-btn-danger tron-btn text-xs w-full" @click="handleClear">CLEAR CURRENT BUILD</button>
+            <button class="tron-btn-danger tron-btn text-xs w-full" @click="confirmClear">CLEAR CURRENT BUILD</button>
           </div>
 
           <div class="border-t border-tron-cyan/10 my-3"></div>
@@ -207,6 +207,14 @@ function handleDelete(id) {
   loadSavedBuilds()
   statusMsg.value = 'Build deleted'
   setTimeout(() => { statusMsg.value = '' }, 2000)
+}
+
+function confirmClear() {
+  confirmIfNeeded(() => {
+    store.clearAll()
+    statusMsg.value = 'Build cleared'
+    setTimeout(() => { statusMsg.value = '' }, 2000)
+  })
 }
 
 function handleClear() {

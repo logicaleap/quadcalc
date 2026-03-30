@@ -569,10 +569,11 @@ provide('openSettings', () => { showSettings.value = true })
 
 /* Mobile layout */
 .app-root.mobile {
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: auto;
-  min-height: 100vh;
+  overflow: hidden;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 .app-root.mobile .top-bar {
   position: sticky;
@@ -584,7 +585,8 @@ provide('openSettings', () => { showSettings.value = true })
 .app-root.mobile .diagram-area {
   position: relative;
   top: auto;
-  min-height: 60vh;
+  flex: 1;
+  min-height: 0;
   padding: 10px;
 }
 .app-root.mobile .onboarding-overlay {
@@ -612,13 +614,6 @@ provide('openSettings', () => { showSettings.value = true })
   overflow-y: auto;
 }
 .app-root.mobile .bottom-info {
-  position: relative;
-  flex-direction: column;
-  gap: 4px;
-  text-align: center;
-  padding: 12px;
-  bottom: auto;
-  left: auto;
-  right: auto;
+  display: none;
 }
 </style>

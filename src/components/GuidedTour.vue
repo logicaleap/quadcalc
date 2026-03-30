@@ -42,7 +42,7 @@ const STEPS = [
     title: 'The Drone Diagram',
     text: 'Each circle represents a component on your quad. Click any one to browse presets and add it to your build.',
     target: '.quad-diagram-wrapper',
-    position: 'top',
+    position: 'bottom',
   },
   {
     title: 'Build Stats',
@@ -52,26 +52,38 @@ const STEPS = [
   },
   {
     title: 'Builds & Templates',
-    text: 'Save your build, load starter templates, import/export as JSON or CSV, and share a link with friends.',
-    target: '.share-wrapper',
+    text: 'Save your builds, load starter templates, or import/export as JSON and CSV.',
+    targetText: 'BUILDS',
     position: 'bottom',
   },
   {
     title: 'Compatibility Checks',
-    text: 'QuadCalc automatically checks if your parts work together. Mismatched props, wrong voltage, incompatible video systems — it catches it all.',
-    target: '.quad-diagram-wrapper',
-    position: 'top',
-  },
-  {
-    title: 'AI Assistant',
-    text: 'Ask the AI anything about your build — "What motor for a 5-inch?", "Is this compatible?", or "What should I buy next?". Needs a free OpenRouter API key.',
-    targetText: 'AI',
-    position: 'top',
+    text: 'QuadCalc automatically checks if your parts work together. The compatibility score drops when there are issues — mismatched props, wrong voltage, or incompatible video systems.',
+    target: '.build-summary .score-good, .build-summary .score-warn, .build-summary .score-bad, .build-summary .stat-block',
+    position: 'bottom',
   },
   {
     title: 'Import from URL',
     text: 'Paste a product link from any FPV store and the AI will extract the specs automatically — great for adding parts that aren\'t in the preset list.',
     targetText: 'IMPORT URL',
+    position: 'bottom',
+  },
+  {
+    title: 'AI Assistant',
+    text: 'Ask the AI anything about your build — "What motor for a 5-inch?", "Is this compatible?", or "What should I buy next?"',
+    targetText: 'AI',
+    position: 'top',
+  },
+  {
+    title: 'Share Your Build',
+    text: 'Share a link to your build, copy a shopping list, or export as JSON/CSV to send to a friend.',
+    target: '.share-wrapper',
+    position: 'bottom',
+  },
+  {
+    title: 'Settings',
+    text: 'Set your OpenRouter API key here to enable the AI assistant and URL import features. The key is stored locally in your browser.',
+    target: 'button[title="Settings"]',
     position: 'bottom',
   },
 ]
@@ -131,27 +143,21 @@ const tooltipStyle = computed(() => {
   const r = targetRect.value
   const pos = currentStep.value.position || 'bottom'
   const tooltipWidth = 320
+  const tooltipEstHeight = 160
   let top, left
 
   if (pos === 'bottom') {
     top = r.top + r.height + 12
-    left = r.left + r.width / 2 - tooltipWidth / 2
   } else {
-    top = r.top - 12
-    left = r.left + r.width / 2 - tooltipWidth / 2
+    top = r.top - 12 - tooltipEstHeight
   }
 
-  // Clamp to viewport
+  left = r.left + r.width / 2 - tooltipWidth / 2
+
+  // Clamp to viewport edges
   left = Math.max(12, Math.min(left, window.innerWidth - tooltipWidth - 12))
-  if (pos === 'top') {
-    // Position above — will use transform to shift up
-    return {
-      top: `${top}px`,
-      left: `${left}px`,
-      width: `${tooltipWidth}px`,
-      transform: 'translateY(-100%)',
-    }
-  }
+  top = Math.max(12, Math.min(top, window.innerHeight - tooltipEstHeight - 12))
+
   return {
     top: `${top}px`,
     left: `${left}px`,

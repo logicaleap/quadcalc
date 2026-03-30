@@ -585,6 +585,18 @@ provide('openSettings', () => { showSettings.value = true })
   min-height: 60vh;
   padding: 10px;
 }
+.app-root.mobile .onboarding-overlay {
+  position: relative;
+  bottom: auto;
+  left: auto;
+  transform: none;
+  width: 100%;
+  padding: 0 8px;
+}
+.app-root.mobile .onboarding-card {
+  max-width: 100%;
+  width: 100%;
+}
 .app-root.mobile .bottom-info {
   position: relative;
   flex-direction: column;

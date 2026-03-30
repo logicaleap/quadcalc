@@ -81,12 +81,6 @@
       </div>
     </Transition>
 
-    <!-- 14/14 Celebration -->
-    <Transition name="expand">
-      <div v-if="store.filledCount >= requiredSlots" class="celebration-bar">
-        <span class="celebration-text">BUILD COMPLETE</span>
-      </div>
-    </Transition>
   </div>
 </template>
 
@@ -100,7 +94,6 @@ const store = useBuildStore()
 const { compatibilityScore } = useCompatibility()
 
 const totalSlots = CATEGORIES.length
-const requiredSlots = CATEGORIES.filter(c => c.key !== 'other').length
 const formattedCost = computed(() => formatCurrency(store.totalCost))
 const formattedWeight = computed(() => formatWeight(store.totalWeight))
 const formattedTWR = computed(() => store.thrustToWeightRatio != null ? formatTWR(store.thrustToWeightRatio) : '—')
@@ -315,29 +308,6 @@ const breakdownSegments = computed(() => {
   height: 6px;
   border-radius: 50%;
   flex-shrink: 0;
-}
-
-.celebration-bar {
-  margin-top: 8px;
-  padding: 4px 16px;
-  border: 1px solid var(--qc-green-03);
-  background: var(--qc-green-006);
-  text-align: center;
-  animation: celebration-glow 2s ease-in-out infinite;
-}
-
-.celebration-text {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--color-tron-green);
-  letter-spacing: 3px;
-  text-shadow: var(--qc-glow-text-green);
-}
-
-@keyframes celebration-glow {
-  0%, 100% { box-shadow: 0 0 8px var(--qc-green-015); }
-  50% { box-shadow: 0 0 16px var(--qc-green-03), 0 0 32px var(--qc-green-008); }
 }
 
 @media (max-width: 768px) {

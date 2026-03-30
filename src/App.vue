@@ -581,6 +581,13 @@ provide('openSettings', () => { showSettings.value = true })
   justify-content: center;
   gap: 8px;
   padding: 8px 12px;
+  order: 1;
+}
+.app-root.mobile .build-summary {
+  order: 2;
+}
+.app-root.mobile .ai-chat-wrapper {
+  order: 2;
 }
 .app-root.mobile .diagram-area {
   position: relative;
@@ -588,6 +595,7 @@ provide('openSettings', () => { showSettings.value = true })
   flex: 1;
   min-height: 0;
   padding: 10px;
+  order: 3;
 }
 .app-root.mobile .onboarding-overlay {
   position: fixed;

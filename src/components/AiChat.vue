@@ -293,4 +293,30 @@ watch(messages, () => {
   opacity: 0;
   transform: translateY(20px) scale(0.95);
 }
+
+@media (max-width: 768px) {
+  .ai-chat-wrapper {
+    position: relative;
+    bottom: auto;
+    right: auto;
+    align-self: flex-start;
+    margin: 4px 0 0 8px;
+    z-index: 16;
+  }
+  .ai-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: 10px;
+  }
+  .ai-panel {
+    position: fixed;
+    inset: 0;
+    bottom: 0;
+    right: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0;
+  }
+}
 </style>

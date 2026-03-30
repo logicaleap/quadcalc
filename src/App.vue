@@ -83,8 +83,12 @@
           <div class="onboarding-card tron-panel">
             <div class="onboarding-header">
               <h2 class="onboarding-title">BUILD YOUR QUAD</h2>
-              <p class="onboarding-subtitle">Click any component on the diagram to start picking parts</p>
+              <p class="onboarding-subtitle">Pick a starting point</p>
             </div>
+            <button class="onboarding-scratch-btn" @click="startFromScratch">
+              <span class="scratch-label">Start from Scratch</span>
+              <span class="scratch-hint">Pick each component yourself</span>
+            </button>
             <div class="onboarding-divider"></div>
             <div class="onboarding-starter-section">
               <span class="onboarding-or-label">OR LOAD A STARTER BUILD</span>
@@ -215,6 +219,10 @@ const appVersion = __APP_VERSION__
 // Onboarding — starter build icons and loading
 const starterIcons = { 'tpl-budget-5': '5"', 'tpl-premium-5': 'HD', 'tpl-cinewhoop-3': '3"', 'tpl-longrange-7': '7"', 'tpl-tinywhoop': 'TW' }
 const starterTemplates = templates.map(t => ({ ...t, icon: starterIcons[t.id] || '?' }))
+
+function startFromScratch() {
+  store.selectedCategory = 'frame'
+}
 
 function loadStarterBuild(tpl) {
   const comps = {}
@@ -440,6 +448,38 @@ provide('openSettings', () => { showSettings.value = true })
   margin: 0;
   opacity: 0.7;
 }
+.onboarding-scratch-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  background: var(--qc-cyan-008);
+  border: 1px solid var(--qc-cyan-03);
+  color: var(--qc-cyan);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.onboarding-scratch-btn:hover {
+  background: var(--qc-cyan-015);
+  border-color: var(--qc-cyan);
+  box-shadow: var(--qc-glow-cyan);
+}
+.scratch-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.scratch-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  color: var(--qc-text);
+  opacity: 0.6;
+}
+
 .onboarding-divider {
   height: 1px;
   background: var(--qc-cyan-015);

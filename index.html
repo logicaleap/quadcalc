@@ -4,23 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>QuadCalc — FPV Drone Build Planner</title>
-    <meta name="description" content="Plan and build your FPV drone with QuadCalc. Choose from 1000+ real components, check compatibility, estimate thrust-to-weight ratio, flight time, and total cost." />
-    <meta name="keywords" content="FPV, drone, quad, build planner, quadcopter, racing drone, freestyle drone, component picker, thrust to weight" />
+    <meta name="description" content="Free FPV drone build planner with 1,100+ real components. Check compatibility between frames, motors, ESCs, flight controllers, VTX, and goggles. Estimate cost, weight, thrust-to-weight ratio, and flight time." />
+    <meta name="keywords" content="FPV, drone, quad, build planner, quadcopter, racing drone, freestyle drone, cinewhoop, tiny whoop, component picker, thrust to weight, compatibility checker, betaflight, ELRS, DJI O3, DJI O4, Walksnail, HDZero" />
     <meta name="author" content="LogicaLeap" />
     <link rel="canonical" href="https://quadcalc.shamir.com.au/" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="QuadCalc — FPV Drone Build Planner" />
-    <meta property="og:description" content="Plan your FPV drone build with 1000+ real components, compatibility checks, and performance estimates." />
+    <meta property="og:description" content="Free FPV drone build planner with 1,100+ real components, compatibility checks, and performance estimates." />
     <meta property="og:url" content="https://quadcalc.shamir.com.au/" />
     <meta property="og:image" content="https://quadcalc.shamir.com.au/icons/icon-512.png" />
     <meta property="og:site_name" content="QuadCalc" />
 
     <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="QuadCalc — FPV Drone Build Planner" />
-    <meta name="twitter:description" content="Plan your FPV drone build with 1000+ real components, compatibility checks, and performance estimates." />
+    <meta name="twitter:description" content="Free FPV drone build planner with 1,100+ real components, compatibility checks, and performance estimates." />
     <meta name="twitter:image" content="https://quadcalc.shamir.com.au/icons/icon-512.png" />
 
     <!-- Favicon -->
@@ -29,6 +29,32 @@
 
     <!-- Theme -->
     <meta name="theme-color" content="#0a0e14" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "QuadCalc",
+      "url": "https://quadcalc.shamir.com.au/",
+      "description": "Free FPV drone build planner with 1,100+ real components. Check compatibility between frames, motors, ESCs, flight controllers, VTX, and goggles.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "browserRequirements": "Requires JavaScript",
+      "softwareVersion": "1.0",
+      "author": {
+        "@type": "Person",
+        "name": "Asaf Shamir",
+        "url": "https://asafshamir.com"
+      },
+      "keywords": "FPV, drone, build planner, quadcopter, compatibility checker, freestyle, cinewhoop, racing drone"
+    }
+    </script>
     <!-- PostHog -->
     <script>
       !function(t,e){var o,n,p,r;e.__SV||(window.posthog && window.posthog.__loaded)||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="Ci init Vi Ji Dt Gi Ki Bi Wi capture calculateEventProperties ie register register_once register_for_session unregister unregister_for_session ne getFeatureFlag getFeatureFlagPayload getFeatureFlagResult isFeatureEnabled reloadFeatureFlags updateFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSurveysLoaded onSessionId getSurveys getActiveMatchingSurveys renderSurvey displaySurvey cancelPendingSurvey canRenderSurvey canRenderSurveyAsync identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException startExceptionAutocapture stopExceptionAutocapture loadToolbar get_property getSessionProperty re Zi createPersonProfile setInternalOrTestUser se zi oe opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing get_explicit_consent_status is_capturing clear_opt_in_out_capturing Xi debug xt ee getPageViewId captureTraceFeedback captureTraceMetric ji".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
@@ -41,6 +67,26 @@
   </head>
   <body>
     <div id="app"></div>
+    <noscript>
+      <div style="max-width:700px;margin:40px auto;padding:0 20px;font-family:sans-serif;color:#c5d0e0;">
+        <h1>QuadCalc — FPV Drone Build Planner</h1>
+        <p>QuadCalc is a free browser-based tool for planning FPV drone builds. Choose from over 1,100 real components — frames, motors, propellers, batteries, flight controllers, ESCs, VTX, cameras, receivers, transmitters, goggles, and antennas — and QuadCalc checks if they're all compatible.</p>
+        <h2>Features</h2>
+        <ul>
+          <li>1,100+ real FPV components with accurate specs and pricing</li>
+          <li>Automatic compatibility checking — frame size vs props, video system matching (Analog, DJI, HDZero, Walksnail), radio protocol matching (ELRS, Crossfire, FrSky), battery voltage validation, mount pattern verification</li>
+          <li>Real-time build stats — total cost, weight, thrust-to-weight ratio, and estimated flight time</li>
+          <li>Starter build templates — Budget 5" Freestyle, Premium 5" HD, 3" Cinewhoop, 7" Long Range, Tiny Whoop</li>
+          <li>AI assistant that understands your build and answers FPV questions</li>
+          <li>Import components from any FPV store URL</li>
+          <li>Save, load, export, and share builds</li>
+          <li>Works on desktop and mobile</li>
+        </ul>
+        <h2>Supported Component Categories</h2>
+        <p>Frames (5", 3", 7", 10", Tiny Whoop) · Motors (0802-2812) · Propellers · LiPo Batteries (1S-6S) · Flight Controllers (F405, F722, H743, AIO) · ESCs (BLHeli_S, BLHeli_32, AM32) · Video Transmitters (Analog, DJI O3/O4, HDZero, Walksnail Avatar) · FPV Cameras · Receivers (ELRS, Crossfire, FrSky, FlySky) · Transmitters (RadioMaster, TBS) · Goggles · VTX Antennas · RX Antennas · Accessories</p>
+        <p>QuadCalc requires JavaScript to run. Please enable JavaScript in your browser.</p>
+      </div>
+    </noscript>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

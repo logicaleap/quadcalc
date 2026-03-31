@@ -25,11 +25,11 @@ jobs:
           <head>
             <meta charset="utf-8">
             <title>Redirecting to QuadCalc</title>
-            <meta http-equiv="refresh" content="0;url=https://quadcalc.shamir.com.au">
-            <link rel="canonical" href="https://quadcalc.shamir.com.au">
+            <meta http-equiv="refresh" content="0;url=https://quadcalc.asafshamir.com">
+            <link rel="canonical" href="https://quadcalc.asafshamir.com">
           </head>
           <body>
-            <p>Redirecting to <a href="https://quadcalc.shamir.com.au">quadcalc.shamir.com.au</a>...</p>
+            <p>Redirecting to <a href="https://quadcalc.asafshamir.com">quadcalc.asafshamir.com</a>...</p>
           </body>
           </html>
           HTML

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://quadcalc.shamir.com.au/sitemap.xml
+Sitemap: https://quadcalc.asafshamir.com/sitemap.xml

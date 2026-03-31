@@ -31,4 +31,4 @@ All presets use realistic specs from real FPV products. Key data fields:
 
 ## URL
 
-https://quadcalc.shamir.com.au/
+https://quadcalc.asafshamir.com/

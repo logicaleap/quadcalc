@@ -132,11 +132,58 @@ export const useBuildStore = defineStore('build', () => {
     return breakdown
   })
 
+  // Map motor stator size → typical prop size (inches)
+  const MOTOR_TYPICAL_PROP = {
+    '0702': 1.6, '0802': 1.6, '0803': 1.6,
+    '1102': 2.5, '1103': 2.5, '1104': 2.5,
+    '1204': 3, '1303': 3,
+    '1404': 3, '1408': 3,
+    '1504': 3.5, '1505': 3.5, '1506': 3.5, '1507': 3.5,
+    '2004': 5, '2005': 5, '2006': 3.5,
+    '2105': 5, '2203': 3.5,
+    '2207': 5, '2208': 5,
+    '2306': 5,
+    '2405': 5, '2407': 6,
+    '2506': 6, '2806': 7, '2807': 7, '2809': 7,
+    '2812': 8,
+  }
+
+  const propMatchStatus = computed(() => {
+    const motor = components.value.motors
+    const prop = components.value.propellers
+    if (!motor?.specs?.size || !prop?.specs?.size) return null
+    const typicalPropSize = MOTOR_TYPICAL_PROP[motor.specs.size]
+    if (!typicalPropSize) return null
+    let propSize = parseFloat(prop.specs.size) || 0
+    // Convert mm props to inches (whoop props listed as "40mm", "31mm")
+    if (String(prop.specs.size).toLowerCase().includes('mm') || propSize > 15) {
+      propSize = propSize / 25.4
+    }
+    if (propSize < 0.5) return null
+    const ratio = propSize / typicalPropSize
+    if (ratio > 1.15) return 'oversized'
+    if (ratio < 0.85) return 'undersized'
+    return 'typical'
+  })
+
   const thrustToWeightRatio = computed(() => {
     const motor = components.value.motors
     if (!motor?.specs?.thrust_grams || !totalWeight.value) return null
+    // thrust_grams is measured at motor's max rated voltage.
+    // Scale by (battery voltage / motor max voltage)² since thrust ∝ RPM² ∝ V²
+    let thrustPerMotor = motor.specs.thrust_grams
+    const battery = components.value.battery
+    if (battery?.specs?.voltage && motor.specs.voltage) {
+      const batCells = parseInt(battery.specs.voltage) || 0
+      // Motor voltage is like "4-6S" or "6S" — use the max
+      const motorMaxCells = parseInt(motor.specs.voltage.split('-').pop()) || 0
+      if (batCells > 0 && motorMaxCells > 0 && batCells < motorMaxCells) {
+        const voltageRatio = batCells / motorMaxCells
+        thrustPerMotor = thrustPerMotor * voltageRatio * voltageRatio
+      }
+    }
     // Use 80% of peak static thrust for realistic effective TWR
-    return (motor.specs.thrust_grams * 4 * 0.8) / totalWeight.value
+    return (thrustPerMotor * 4 * 0.8) / totalWeight.value
   })
 
   const estimatedFlightTime = computed(() => {
@@ -314,6 +361,7 @@ export const useBuildStore = defineStore('build', () => {
     totalWeight,
     weightBreakdown,
     thrustToWeightRatio,
+    propMatchStatus,
     estimatedFlightTime,
     canUndo,
     canRedo,

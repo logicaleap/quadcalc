@@ -41,11 +41,18 @@
       </div>
 
       <!-- TWR (always visible on desktop, hidden on mobile when empty) -->
-      <div class="stat-block" :class="[twrClass, { 'hide-mobile-empty': store.thrustToWeightRatio == null }]" :title="twrTooltip">
+      <div
+        class="stat-block"
+        :class="[twrClass, { 'hide-mobile-empty': store.thrustToWeightRatio == null, 'clickable': store.thrustToWeightRatio != null }]"
+        :title="twrTooltip"
+        @click="showTwrNote = !showTwrNote"
+      >
         <div class="stat-value">{{ formattedTWR }}</div>
         <div class="stat-label">
           TWR
           <span v-if="twrTag" class="stat-tag" :class="twrClass">{{ twrTag }}</span>
+          <span v-if="propMatch === 'oversized'" class="stat-tag prop-warn">BIG PROP</span>
+          <span v-if="propMatch === 'undersized'" class="stat-tag prop-warn">SMALL PROP</span>
         </div>
       </div>
 
@@ -55,6 +62,14 @@
         <div class="stat-label">FLIGHT</div>
       </div>
     </div>
+
+    <!-- TWR/Flight estimation note -->
+    <Transition name="expand">
+      <div v-if="showTwrNote && store.thrustToWeightRatio != null" class="twr-note">
+        <span>{{ twrNoteText }}</span>
+        <button class="twr-note-close" @click.stop="showTwrNote = false">&times;</button>
+      </div>
+    </Transition>
 
     <!-- Weight breakdown bar -->
     <Transition name="expand">
@@ -99,6 +114,8 @@ const formattedWeight = computed(() => formatWeight(store.totalWeight))
 const formattedTWR = computed(() => store.thrustToWeightRatio != null ? formatTWR(store.thrustToWeightRatio) : '—')
 const formattedFlightTime = computed(() => store.estimatedFlightTime != null ? `~${Math.round(store.estimatedFlightTime)} min` : '—')
 const showBreakdown = ref(false)
+const showTwrNote = ref(false)
+const propMatch = computed(() => store.propMatchStatus)
 
 const scoreClass = computed(() => {
   if (compatibilityScore.value >= 90) return 'score-good'
@@ -117,7 +134,7 @@ const twrClass = computed(() => {
 const twrTag = computed(() => {
   const r = store.thrustToWeightRatio
   if (r == null) return ''
-  if (r >= 8) return 'RACE'
+  if (r >= 10) return 'RACE'
   if (r >= 5) return 'FREESTYLE'
   if (r >= 3) return 'CRUISE'
   if (r >= 2) return 'HEAVY'
@@ -126,12 +143,23 @@ const twrTag = computed(() => {
 
 const twrTooltip = computed(() => {
   if (store.thrustToWeightRatio == null) return 'Add motors + battery to calculate thrust-to-weight ratio'
-  return `Thrust-to-weight ratio: ${store.thrustToWeightRatio.toFixed(1)}:1`
+  return `TWR ${store.thrustToWeightRatio.toFixed(1)}:1 — click for details`
 })
 
 const flightTooltip = computed(() => {
   if (store.estimatedFlightTime == null) return 'Add motors + battery to estimate flight time'
   return `Estimated flight time: ~${Math.round(store.estimatedFlightTime)} minutes`
+})
+
+const twrNoteText = computed(() => {
+  const parts = ['Estimated with typical prop for this motor class.']
+  if (propMatch.value === 'oversized') {
+    parts.push('Your prop is larger than typical — real thrust may be higher but draws more current.')
+  } else if (propMatch.value === 'undersized') {
+    parts.push('Your prop is smaller than typical — real thrust will be lower.')
+  }
+  parts.push('Flight time is a rough estimate based on build class and battery size.')
+  return parts.join(' ')
 })
 
 const CATEGORY_COLORS = {
@@ -240,6 +268,38 @@ const breakdownSegments = computed(() => {
   border: 1px solid currentColor;
   opacity: 0.7;
   line-height: 1.4;
+}
+.stat-tag.prop-warn {
+  color: var(--color-tron-yellow);
+  border-color: var(--color-tron-yellow);
+}
+
+.twr-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: var(--qc-cyan-005);
+  border: 1px solid var(--qc-cyan-01);
+  font-size: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--qc-text-muted);
+  line-height: 1.5;
+  max-width: 400px;
+}
+.twr-note-close {
+  background: none;
+  border: none;
+  color: var(--qc-text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.twr-note-close:hover {
+  color: var(--qc-cyan);
 }
 
 .score-good .stat-value { color: var(--color-tron-green); }

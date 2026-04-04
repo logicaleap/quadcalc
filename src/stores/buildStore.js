@@ -132,6 +132,17 @@ export const useBuildStore = defineStore('build', () => {
     return breakdown
   })
 
+  const costBreakdown = computed(() => {
+    const breakdown = {}
+    for (const cat of CATEGORIES) {
+      const c = components.value[cat.key]
+      if (!c?.cost) { breakdown[cat.key] = 0; continue }
+      breakdown[cat.key] = c.category === 'motors' ? c.cost * 4 : c.cost
+    }
+    breakdown.total = Object.values(breakdown).reduce((s, v) => s + v, 0)
+    return breakdown
+  })
+
   // Map motor stator size → typical prop size (inches)
   const MOTOR_TYPICAL_PROP = {
     '0702': 1.6, '0802': 1.6, '0803': 1.6,
@@ -360,6 +371,7 @@ export const useBuildStore = defineStore('build', () => {
     totalCost,
     totalWeight,
     weightBreakdown,
+    costBreakdown,
     thrustToWeightRatio,
     propMatchStatus,
     estimatedFlightTime,

@@ -29,15 +29,15 @@
       </div>
 
       <!-- Cost -->
-      <div class="stat-block">
+      <div class="stat-block clickable" @click="openBreakdown('cost')" title="Show cost breakdown">
         <div class="stat-value text-tron-text-bright">{{ formattedCost }}</div>
         <div class="stat-label">COST</div>
       </div>
 
       <!-- Weight -->
-      <div class="stat-block clickable" @click="showBreakdown = !showBreakdown" :title="showBreakdown ? 'Hide weight breakdown' : 'Show weight breakdown'">
+      <div class="stat-block clickable" @click="openBreakdown('weight')" title="Show weight breakdown">
         <div class="stat-value text-tron-text-bright">{{ formattedWeight }}</div>
-        <div class="stat-label">WEIGHT {{ showBreakdown ? '▼' : '▶' }}</div>
+        <div class="stat-label">WEIGHT</div>
       </div>
 
       <!-- TWR (always visible on desktop, hidden on mobile when empty) -->
@@ -71,31 +71,12 @@
       </div>
     </Transition>
 
-    <!-- Weight breakdown bar -->
-    <Transition name="expand">
-      <div v-if="showBreakdown && hasWeight" class="weight-breakdown">
-        <div class="breakdown-bar">
-          <div
-            v-for="seg in breakdownSegments"
-            :key="seg.key"
-            class="bar-segment"
-            :style="{ width: seg.pct + '%', backgroundColor: seg.color }"
-            :title="`${seg.label}: ${seg.weight}g (${Math.round(seg.pct)}%)`"
-          ></div>
-        </div>
-        <div class="breakdown-legend">
-          <span
-            v-for="seg in breakdownSegments"
-            :key="seg.key"
-            class="legend-item"
-          >
-            <span class="legend-dot" :style="{ backgroundColor: seg.color }"></span>
-            {{ seg.label }} {{ seg.weight }}g
-          </span>
-        </div>
-      </div>
-    </Transition>
-
+    <!-- Breakdown Modal -->
+    <BreakdownModal
+      :show="showBreakdownModal"
+      :initial-tab="breakdownInitialTab"
+      @close="showBreakdownModal = false"
+    />
   </div>
 </template>
 
@@ -103,7 +84,8 @@
 import { computed, ref } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
-import { formatCurrency, formatWeight, formatTWR, CATEGORIES, CATEGORY_MAP } from '../utils/helpers.js'
+import { formatCurrency, formatWeight, formatTWR, CATEGORIES } from '../utils/helpers.js'
+import BreakdownModal from './BreakdownModal.vue'
 
 const store = useBuildStore()
 const { compatibilityScore } = useCompatibility()
@@ -113,9 +95,16 @@ const formattedCost = computed(() => formatCurrency(store.totalCost))
 const formattedWeight = computed(() => formatWeight(store.totalWeight))
 const formattedTWR = computed(() => store.thrustToWeightRatio != null ? formatTWR(store.thrustToWeightRatio) : '—')
 const formattedFlightTime = computed(() => store.estimatedFlightTime != null ? `~${Math.round(store.estimatedFlightTime)} min` : '—')
-const showBreakdown = ref(false)
 const showTwrNote = ref(false)
 const propMatch = computed(() => store.propMatchStatus)
+
+// Breakdown modal
+const showBreakdownModal = ref(false)
+const breakdownInitialTab = ref('weight')
+function openBreakdown(tab) {
+  breakdownInitialTab.value = tab
+  showBreakdownModal.value = true
+}
 
 const scoreClass = computed(() => {
   if (compatibilityScore.value >= 90) return 'score-good'
@@ -162,38 +151,6 @@ const twrNoteText = computed(() => {
   return parts.join(' ')
 })
 
-const CATEGORY_COLORS = {
-  frame: '#00f0ff',
-  motors: '#3d5afe',
-  propellers: '#7c4dff',
-  battery: '#ffb800',
-  fc: '#00ff88',
-  esc: '#ff6d00',
-  vtx: '#e040fb',
-  camera: '#ff003c',
-  rx: '#00e5ff',
-  tx: '#76ff03',
-  goggles: '#ffd740',
-  vtxAntenna: '#ff4081',
-  rxAntenna: '#ff80ab',
-  other: '#8d6e63',
-}
-
-const hasWeight = computed(() => store.weightBreakdown.total > 0)
-
-const breakdownSegments = computed(() => {
-  const bd = store.weightBreakdown
-  if (!bd.total) return []
-  return CATEGORIES
-    .filter(c => bd[c.key] > 0)
-    .map(c => ({
-      key: c.key,
-      label: c.label,
-      weight: bd[c.key],
-      pct: (bd[c.key] / bd.total) * 100,
-      color: CATEGORY_COLORS[c.key] || '#8d6e63',
-    }))
-})
 </script>
 
 <style scoped>
@@ -327,48 +284,6 @@ const breakdownSegments = computed(() => {
   cursor: not-allowed;
 }
 
-.weight-breakdown {
-  width: 100%;
-  margin-top: 8px;
-  min-width: 300px;
-}
-
-.breakdown-bar {
-  display: flex;
-  height: 6px;
-  border-radius: 3px;
-  overflow: hidden;
-  gap: 1px;
-}
-
-.bar-segment {
-  min-width: 2px;
-  transition: width 0.3s ease;
-}
-
-.breakdown-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
-  justify-content: center;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-  font-size: 9px;
-  font-family: 'Share Tech Mono', monospace;
-  color: var(--qc-text-muted);
-}
-
-.legend-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
 
 @media (max-width: 768px) {
   .build-summary {
@@ -388,9 +303,6 @@ const breakdownSegments = computed(() => {
   }
   .stat-block.hide-mobile-empty {
     display: none;
-  }
-  .weight-breakdown {
-    min-width: 250px;
   }
 }
 

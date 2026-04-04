@@ -37,6 +37,23 @@ export const CATEGORIES = [
 
 export const CATEGORY_MAP = Object.fromEntries(CATEGORIES.map(c => [c.key, c]))
 
+export const CATEGORY_COLORS = {
+  frame: '#00f0ff',
+  motors: '#3d5afe',
+  propellers: '#7c4dff',
+  battery: '#ffb800',
+  fc: '#00ff88',
+  esc: '#ff6d00',
+  vtx: '#e040fb',
+  camera: '#ff003c',
+  rx: '#00e5ff',
+  tx: '#76ff03',
+  goggles: '#ffd740',
+  vtxAntenna: '#ff4081',
+  rxAntenna: '#ff80ab',
+  other: '#8d6e63',
+}
+
 export function formatTWR(ratio) {
   if (ratio == null) return '—'
   return `${ratio.toFixed(1)}:1`

@@ -24,7 +24,7 @@
 
       <!-- Components -->
       <div class="stat-block">
-        <div class="stat-value text-tron-cyan">{{ store.filledCount }}<span class="text-tron-text/30">/{{ totalSlots }}</span></div>
+        <div class="stat-value text-tron-cyan">{{ filledCount }}<span class="text-tron-text/30">/{{ totalSlots }}</span></div>
         <div class="stat-label">PARTS</div>
       </div>
 
@@ -43,7 +43,7 @@
       <!-- TWR (always visible on desktop, hidden on mobile when empty) -->
       <div
         class="stat-block"
-        :class="[twrClass, { 'hide-mobile-empty': store.thrustToWeightRatio == null, 'clickable': store.thrustToWeightRatio != null }]"
+        :class="[twrClass, { 'hide-mobile-empty': formattedTWR === '—', 'clickable': formattedTWR !== '—' }]"
         :title="twrTooltip"
         @click="showTwrNote = !showTwrNote"
       >
@@ -57,7 +57,7 @@
       </div>
 
       <!-- Flight Time (always visible on desktop, hidden on mobile when empty) -->
-      <div class="stat-block" :class="{ 'hide-mobile-empty': store.estimatedFlightTime == null }" :title="flightTooltip">
+      <div class="stat-block" :class="{ 'hide-mobile-empty': formattedFlightTime === '—' }" :title="flightTooltip">
         <div class="stat-value text-tron-text-bright">{{ formattedFlightTime }}</div>
         <div class="stat-label">FLIGHT</div>
       </div>
@@ -84,19 +84,34 @@
 import { computed, ref } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
+import { useFwCompatibility } from '../composables/useFwCompatibility.js'
+import { useFwPerformance } from '../composables/useFwPerformance.js'
 import { formatCurrency, formatWeight, formatTWR, CATEGORIES } from '../utils/helpers.js'
+import { FW_CATEGORIES } from '../data/fwCategories.js'
 import BreakdownModal from './BreakdownModal.vue'
 
 const store = useBuildStore()
-const { compatibilityScore } = useCompatibility()
+const quadCompat = useCompatibility()
+const fwCompat = useFwCompatibility()
+const fw = useFwPerformance()
 
-const totalSlots = CATEGORIES.length
-const formattedCost = computed(() => formatCurrency(store.totalCost))
-const formattedWeight = computed(() => formatWeight(store.totalWeight))
-const formattedTWR = computed(() => store.thrustToWeightRatio != null ? formatTWR(store.thrustToWeightRatio) : '—')
-const formattedFlightTime = computed(() => store.estimatedFlightTime != null ? `~${Math.round(store.estimatedFlightTime)} min` : '—')
+const isFw = computed(() => store.buildMode === 'fixedwing')
+const compatibilityScore = computed(() => isFw.value ? fwCompat.compatibilityScore.value : quadCompat.compatibilityScore.value)
+
+const totalSlots = computed(() => isFw.value ? FW_CATEGORIES.length : CATEGORIES.length)
+const filledCount = computed(() => isFw.value ? store.fwFilledCount : store.filledCount)
+const formattedCost = computed(() => formatCurrency(isFw.value ? store.fwTotalCost : store.totalCost))
+const formattedWeight = computed(() => formatWeight(isFw.value ? store.fwTotalWeight : store.totalWeight))
+const formattedTWR = computed(() => {
+  if (isFw.value) return fw.formattedFwTwr.value
+  return store.thrustToWeightRatio != null ? formatTWR(store.thrustToWeightRatio) : '—'
+})
+const formattedFlightTime = computed(() => {
+  if (isFw.value) return fw.formattedFlightTime.value
+  return store.estimatedFlightTime != null ? `~${Math.round(store.estimatedFlightTime)} min` : '—'
+})
 const showTwrNote = ref(false)
-const propMatch = computed(() => store.propMatchStatus)
+const propMatch = computed(() => isFw.value ? null : store.propMatchStatus)
 
 // Breakdown modal
 const showBreakdownModal = ref(false)
@@ -113,6 +128,7 @@ const scoreClass = computed(() => {
 })
 
 const twrClass = computed(() => {
+  if (isFw.value) return fw.fwThrustClass.value
   const r = store.thrustToWeightRatio
   if (r == null) return ''
   if (r >= 4) return 'twr-good'
@@ -121,6 +137,7 @@ const twrClass = computed(() => {
 })
 
 const twrTag = computed(() => {
+  if (isFw.value) return fw.fwThrustTag.value
   const r = store.thrustToWeightRatio
   if (r == null) return ''
   if (r >= 10) return 'RACE'
@@ -131,6 +148,10 @@ const twrTag = computed(() => {
 })
 
 const twrTooltip = computed(() => {
+  if (isFw.value) {
+    if (fw.fwThrustToWeight.value == null) return 'Add motor + battery to calculate thrust-to-weight ratio'
+    return `T/W ${fw.fwThrustToWeight.value.toFixed(2)}:1 — click for details`
+  }
   if (store.thrustToWeightRatio == null) return 'Add motors + battery to calculate thrust-to-weight ratio'
   return `TWR ${store.thrustToWeightRatio.toFixed(1)}:1 — click for details`
 })

@@ -97,21 +97,29 @@
 import { computed, inject, ref } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
+import { useFwCompatibility } from '../composables/useFwCompatibility.js'
 import { useStorage } from '../composables/useStorage.js'
 import { CATEGORY_MAP, formatCurrency, formatWeight } from '../utils/helpers.js'
+import { FW_CATEGORY_MAP } from '../data/fwCategories.js'
 import { ICONS } from '../utils/icons.js'
 import { presets } from '../data/presets.js'
+import { fwPresets } from '../data/fwPresets.js'
 import { compatibilityRules } from '../data/compatibilityRules.js'
 import ComponentSelector from './ComponentSelector.vue'
 
 const store = useBuildStore()
-const { alerts } = useCompatibility()
+const quadCompat = useCompatibility()
+const fwCompat = useFwCompatibility()
 const { getCustomPresets } = useStorage()
 const isMobile = inject('isMobile', ref(false))
 const hideIncompatible = ref(false)
 
+const isFw = computed(() => store.buildMode === 'fixedwing')
+const alerts = computed(() => isFw.value ? fwCompat.alerts.value : quadCompat.alerts.value)
+
 const currentCat = computed(() => {
   if (!store.selectedCategory) return null
+  if (isFw.value) return FW_CATEGORY_MAP[store.selectedCategory]
   return CATEGORY_MAP[store.selectedCategory]
 })
 
@@ -121,17 +129,22 @@ const currentIcon = computed(() => {
 
 const currentComponent = computed(() => {
   if (!store.selectedCategory) return null
-  return store.components[store.selectedCategory]
+  return store.activeComponents[store.selectedCategory]
 })
 
 const isMultiplied = computed(() => {
+  if (isFw.value) return false // FW uses single motor/prop
   return store.selectedCategory === 'motors' || store.selectedCategory === 'propellers'
 })
 
 const presetItems = computed(() => {
   if (!store.selectedCategory) return []
-  const builtIn = presets[store.selectedCategory] || []
-  const custom = getCustomPresets()[store.selectedCategory] || []
+  const cat = store.selectedCategory
+  // Check FW-specific presets first, then shared quad presets
+  const fwBuiltIn = fwPresets[cat] || []
+  const quadBuiltIn = presets[cat] || []
+  const builtIn = isFw.value ? (fwBuiltIn.length > 0 ? fwBuiltIn : quadBuiltIn) : quadBuiltIn
+  const custom = getCustomPresets()[cat] || []
   return [...custom, ...builtIn]
 })
 
@@ -171,11 +184,19 @@ const relatedAlerts = computed(() => {
 })
 
 function selectComponent(item) {
-  store.setComponent(store.selectedCategory, item)
+  if (isFw.value) {
+    store.setFwComponent(store.selectedCategory, item)
+  } else {
+    store.setComponent(store.selectedCategory, item)
+  }
 }
 
 function clearSlot() {
-  store.clearComponent(store.selectedCategory)
+  if (isFw.value) {
+    store.clearFwComponent(store.selectedCategory)
+  } else {
+    store.clearComponent(store.selectedCategory)
+  }
 }
 </script>
 

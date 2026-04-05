@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import { CATEGORIES } from '../utils/helpers.js'
+import { FW_CATEGORIES, FW_GROUND_CATEGORIES } from '../data/fwCategories.js'
 
 const DRAFTS_KEY = 'quadcalc_drafts'
 const MAX_DRAFTS = 5
@@ -363,6 +364,86 @@ export const useBuildStore = defineStore('build', () => {
     }
   }
 
+  // ═══════════════════════════════════════════
+  // FIXED-WING MODE
+  // ═══════════════════════════════════════════
+  const buildMode = ref('quad') // 'quad' | 'fixedwing'
+
+  function emptyFwBuild() {
+    const comps = {}
+    FW_CATEGORIES.forEach(c => { comps[c.key] = null })
+    return comps
+  }
+  const fwComponents = ref(emptyFwBuild())
+
+  const activeCategories = computed(() =>
+    buildMode.value === 'fixedwing' ? FW_CATEGORIES : CATEGORIES
+  )
+  const activeComponents = computed(() =>
+    buildMode.value === 'fixedwing' ? fwComponents.value : components.value
+  )
+
+  const fwFilledCount = computed(() =>
+    Object.values(fwComponents.value).filter(Boolean).length
+  )
+
+  const fwTotalWeight = computed(() =>
+    Object.values(fwComponents.value).reduce((sum, c) => {
+      if (!c?.weight || FW_GROUND_CATEGORIES.has(c.category)) return sum
+      return sum + c.weight
+    }, 0)
+  )
+
+  const fwTotalCost = computed(() =>
+    Object.values(fwComponents.value).reduce((sum, c) => {
+      if (!c?.cost) return sum
+      return sum + c.cost
+    }, 0)
+  )
+
+  const fwWeightBreakdown = computed(() => {
+    const breakdown = {}
+    for (const cat of FW_CATEGORIES) {
+      if (FW_GROUND_CATEGORIES.has(cat.key)) { breakdown[cat.key] = 0; continue }
+      const c = fwComponents.value[cat.key]
+      breakdown[cat.key] = c?.weight || 0
+    }
+    breakdown.total = Object.values(breakdown).reduce((s, v) => s + v, 0)
+    return breakdown
+  })
+
+  const fwCostBreakdown = computed(() => {
+    const breakdown = {}
+    for (const cat of FW_CATEGORIES) {
+      const c = fwComponents.value[cat.key]
+      breakdown[cat.key] = c?.cost || 0
+    }
+    breakdown.total = Object.values(breakdown).reduce((s, v) => s + v, 0)
+    return breakdown
+  })
+
+  function setFwComponent(category, component) {
+    if (component) {
+      fwComponents.value[category] = { ...component, category }
+    } else {
+      fwComponents.value[category] = null
+    }
+  }
+
+  function clearFwComponent(category) {
+    fwComponents.value[category] = null
+  }
+
+  function clearFwAll() {
+    Object.keys(fwComponents.value).forEach(k => { fwComponents.value[k] = null })
+    buildName.value = 'Untitled Build'
+  }
+
+  function switchMode(mode) {
+    buildMode.value = mode
+    selectedCategory.value = null
+  }
+
   return {
     components,
     buildName,
@@ -384,5 +465,19 @@ export const useBuildStore = defineStore('build', () => {
     clearAll,
     loadBuild,
     exportBuild,
+    // Fixed-wing
+    buildMode,
+    fwComponents,
+    activeCategories,
+    activeComponents,
+    fwFilledCount,
+    fwTotalWeight,
+    fwTotalCost,
+    fwWeightBreakdown,
+    fwCostBreakdown,
+    setFwComponent,
+    clearFwComponent,
+    clearFwAll,
+    switchMode,
   }
 })

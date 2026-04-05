@@ -12,6 +12,21 @@
         <span class="text-tron-text/20 text-xs font-mono hidden sm:inline">All data saved locally in your browser</span>
       </div>
       <div class="flex items-center gap-2">
+        <!-- Mode toggle: Quad / Fixed Wing -->
+        <div class="mode-toggle">
+          <button
+            class="mode-btn"
+            :class="{ active: store.buildMode === 'quad' }"
+            @click="store.switchMode('quad')"
+            title="Quadcopter mode"
+          >QUAD</button>
+          <button
+            class="mode-btn"
+            :class="{ active: store.buildMode === 'fixedwing' }"
+            @click="store.switchMode('fixedwing')"
+            title="Fixed-wing mode"
+          >WING</button>
+        </div>
         <button class="theme-toggle tron-btn text-xs" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
           <svg v-if="isDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
@@ -75,7 +90,8 @@
 
     <!-- Main diagram area -->
     <main class="diagram-area">
-      <QuadDiagram />
+      <QuadDiagram v-if="store.buildMode === 'quad'" />
+      <FixedWingDiagram v-else />
 
       <!-- Empty-state onboarding overlay -->
       <Transition name="onboarding-fade">
@@ -151,6 +167,7 @@ import { templates } from './data/templates.js'
 import { presets } from './data/presets.js'
 import TronGrid from './components/TronGrid.vue'
 import QuadDiagram from './components/QuadDiagram.vue'
+import FixedWingDiagram from './components/FixedWingDiagram.vue'
 import ComponentPanel from './components/ComponentPanel.vue'
 import BuildSummary from './components/BuildSummary.vue'
 import CompatibilityAlerts from './components/CompatibilityAlerts.vue'
@@ -309,6 +326,37 @@ provide('openSettings', () => { showSettings.value = true })
   color: var(--qc-note-color);
   letter-spacing: 0.5px;
   margin-top: 1px;
+}
+
+/* Mode toggle */
+.mode-toggle {
+  display: flex;
+  border: 1px solid var(--qc-cyan-03);
+  overflow: hidden;
+}
+.mode-btn {
+  background: var(--qc-cyan-005);
+  border: none;
+  color: var(--qc-text-muted);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.mode-btn:first-child {
+  border-right: 1px solid var(--qc-cyan-03);
+}
+.mode-btn.active {
+  background: var(--qc-cyan-015);
+  color: var(--qc-cyan);
+  text-shadow: var(--qc-glow-text-cyan);
+}
+.mode-btn:hover:not(.active) {
+  background: var(--qc-cyan-008);
+  color: var(--qc-cyan-05);
 }
 
 .theme-toggle {

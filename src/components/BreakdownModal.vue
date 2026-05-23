@@ -71,6 +71,16 @@
             <div class="text-tron-text/40 text-sm">No {{ activeTab }} data yet.</div>
             <div class="text-tron-text/20 text-xs mt-1">Add components to your build to see the breakdown.</div>
           </div>
+
+          <!-- One-shot feedback nudge -->
+          <div v-if="showNudge && hasData" class="feedback-nudge">
+            <span class="nudge-icon">💡</span>
+            <span class="nudge-text">
+              See something missing?
+              <a href="#" class="nudge-link" @click.prevent="requestFeedback">Tell Asaf what to add →</a>
+            </span>
+            <button class="nudge-dismiss" @click="dismissNudge" title="Dismiss">&times;</button>
+          </div>
         </div>
       </div>
     </Transition>
@@ -87,7 +97,21 @@ const props = defineProps({
   initialTab: { type: String, default: 'weight' },
 })
 
-defineEmits(['close'])
+const emit = defineEmits(['close', 'request-feedback'])
+
+const FEEDBACK_NUDGE_KEY = 'quadcalc_feedback_nudged'
+const showNudge = ref(localStorage.getItem(FEEDBACK_NUDGE_KEY) !== '1')
+
+function dismissNudge() {
+  localStorage.setItem(FEEDBACK_NUDGE_KEY, '1')
+  showNudge.value = false
+}
+
+function requestFeedback() {
+  dismissNudge()
+  emit('close')
+  emit('request-feedback')
+}
 
 const store = useBuildStore()
 const activeTab = ref(props.initialTab)
@@ -350,6 +374,38 @@ watch(activeTab, () => { sortBy.value = null })
   text-align: center;
   padding: 32px 16px;
 }
+
+.feedback-nudge {
+  margin-top: 14px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px dashed var(--qc-cyan-01);
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--color-tron-text);
+  opacity: 0.85;
+}
+.nudge-icon { font-size: 14px; }
+.nudge-text { flex: 1; }
+.nudge-link {
+  color: var(--color-tron-cyan);
+  text-decoration: underline;
+  margin-left: 4px;
+}
+.nudge-link:hover { text-shadow: 0 0 4px var(--color-tron-cyan); }
+.nudge-dismiss {
+  background: none;
+  border: none;
+  color: var(--color-tron-text);
+  opacity: 0.5;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.nudge-dismiss:hover { opacity: 1; }
 
 .text-right {
   text-align: right;

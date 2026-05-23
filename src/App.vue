@@ -32,6 +32,11 @@
             <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </button>
+        <button class="theme-toggle tron-btn text-xs" @click="showFeedback = true" title="Send feedback">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+        </button>
         <div class="share-wrapper" ref="shareWrapperRef">
           <button
             class="theme-toggle tron-btn text-xs"
@@ -71,7 +76,7 @@
     </header>
 
     <!-- Build Summary (top center) -->
-    <BuildSummary />
+    <BuildSummary @request-feedback="showFeedback = true" />
 
     <!-- Main diagram area -->
     <main class="diagram-area">
@@ -136,6 +141,7 @@
     <SettingsModal :show="showSettings" @close="showSettings = false" />
     <UrlImportModal :show="showUrlImport" @close="showUrlImport = false" />
     <HelpModal :show="showHelp" @close="showHelp = false" />
+    <FeedbackModal :show="showFeedback" @close="showFeedback = false" />
 
     <!-- Guided Tour -->
     <GuidedTour :active="showTour" @end="showTour = false" />
@@ -159,6 +165,7 @@ import SaveLoadModal from './components/SaveLoadModal.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import UrlImportModal from './components/UrlImportModal.vue'
 import HelpModal from './components/HelpModal.vue'
+import FeedbackModal from './components/FeedbackModal.vue'
 import GuidedTour from './components/GuidedTour.vue'
 
 const store = useBuildStore()
@@ -178,6 +185,7 @@ const showSaveLoad = ref(false)
 const showSettings = ref(false)
 const showUrlImport = ref(false)
 const showHelp = ref(false)
+const showFeedback = ref(false)
 const showTour = ref(false)
 
 // Share dropdown

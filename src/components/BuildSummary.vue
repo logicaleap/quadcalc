@@ -76,6 +76,7 @@
       :show="showBreakdownModal"
       :initial-tab="breakdownInitialTab"
       @close="showBreakdownModal = false"
+      @request-feedback="$emit('request-feedback')"
     />
   </div>
 </template>
@@ -86,6 +87,8 @@ import { useBuildStore } from '../stores/buildStore.js'
 import { useCompatibility } from '../composables/useCompatibility.js'
 import { formatCurrency, formatWeight, formatTWR, CATEGORIES } from '../utils/helpers.js'
 import BreakdownModal from './BreakdownModal.vue'
+
+defineEmits(['request-feedback'])
 
 const store = useBuildStore()
 const { compatibilityScore } = useCompatibility()

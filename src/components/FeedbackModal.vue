@@ -114,7 +114,7 @@
 import { ref, computed, watch } from 'vue'
 import { useBuildStore } from '../stores/buildStore.js'
 
-defineProps({ show: Boolean })
+const props = defineProps({ show: Boolean })
 const emit = defineEmits(['close'])
 
 const WEB3FORMS_ACCESS_KEY = 'dfc04377-5763-482a-9690-2c526293722c'
@@ -128,6 +128,34 @@ const botcheck = ref(false)
 const submitting = ref(false)
 const sent = ref(false)
 const error = ref('')
+const country = ref('')
+
+const timezone = (() => {
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || '' } catch { return '' }
+})()
+const locale = (typeof navigator !== 'undefined' && navigator.language) || ''
+const appVersion = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : ''
+
+let countryFetched = false
+async function ensureCountry() {
+  if (countryFetched) return
+  countryFetched = true
+  try {
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 2500)
+    const res = await fetch('https://ipapi.co/json/', { signal: ctrl.signal })
+    clearTimeout(timer)
+    if (!res.ok) return
+    const data = await res.json()
+    if (data && data.country_name) {
+      country.value = data.country_code
+        ? `${data.country_name} (${data.country_code})`
+        : data.country_name
+    }
+  } catch {
+    // silent — country is best-effort
+  }
+}
 
 const messagePlaceholder = computed(() => {
   if (category.value === 'bug') {
@@ -190,6 +218,10 @@ async function submit() {
     category: category.value,
     message: message.value,
     build_snapshot: snapshot ? JSON.stringify(snapshot, null, 2) : '(no build started)',
+    app_version: appVersion || '(unknown)',
+    country: country.value || '(unknown)',
+    timezone: timezone || '(unknown)',
+    locale: locale || '(unknown)',
     page_url: window.location.href,
     user_agent: navigator.userAgent,
     botcheck: botcheck.value,
@@ -214,8 +246,20 @@ async function submit() {
   }
 }
 
-// Reset state when reopened
-watch(() => sent.value, () => {})
+// Reset form state every time the modal opens, and kick off the
+// country lookup in the background so it's ready by submit time.
+watch(() => props.show, (val) => {
+  if (val) {
+    sent.value = false
+    error.value = ''
+    submitting.value = false
+    category.value = 'idea'
+    message.value = ''
+    email.value = ''
+    botcheck.value = false
+    ensureCountry()
+  }
+})
 </script>
 
 <style scoped>

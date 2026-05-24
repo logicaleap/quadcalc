@@ -97,6 +97,8 @@ export const presets = {
   { id: 'frame-speedybee-master5', name: 'SpeedyBee Master 5 V2', description: 'Budget-friendly 5" freestyle frame with T300 3K carbon, 5mm arms, DJI O3 support', cost: 3999, weight: 140, specs: { size: '5', mountPattern: '30.5x30.5', material: 'Carbon Fiber', wheelbase: 226 } },
   { id: 'frame-stanfpv-feather5', name: 'Stan FPV Feather 5"', description: 'Ultra-lightweight 75g sub-250g capable 5" true-X frame for freestyle and long-range', cost: 7499, weight: 75, specs: { size: '5', mountPattern: '30.5x30.5', material: 'Carbon Fiber', wheelbase: 220 } },
   { id: 'frame-lumenier-qavs2-7', name: 'Lumenier QAV-S 2 JohnnyFPV SE 7"', description: '7" long-range version with X-Lock arms, fold-flat design, DJI O4 compatible', cost: 10999, weight: 182, specs: { size: '7', mountPattern: '30.5x30.5', material: 'Carbon Fiber', wheelbase: 295 } },
+  { id: 'frame-geprc-vapor-x5', name: 'GEPRC Vapor X5 O4 Pro', description: 'True-X 5" freestyle frame purpose-built for the DJI O4 Pro Air Unit with a CNC aluminium camera cage and silicone dampers; also fits analog, Walksnail and HDZero', cost: 5999, weight: 172, specs: { size: '5', mountPattern: '30.5x30.5', material: 'Carbon Fiber', wheelbase: 230 } },
+  { id: 'frame-geprc-vapor-d5', name: 'GEPRC Vapor D5 O4 Pro', description: 'Deadcat 5" version of the Vapor built for the DJI O4 Pro Air Unit, rear-set arms keep props out of the HD camera view for clean cinematic footage', cost: 5999, weight: 175, specs: { size: '5', mountPattern: '30.5x30.5', material: 'Carbon Fiber', wheelbase: 238 } },
   ],
 
   motors: [
@@ -577,6 +579,8 @@ export const presets = {
   { id: 'esc-speedybee-60a-v4', name: 'SpeedyBee BLS 60A V4 4-in-1', description: 'Updated 60A BLHeli_S ESC with aluminum heat sink, 80A burst, pairs with SpeedyBee F405 V4', cost: 3999, weight: 24, specs: { current: 60, voltage: '3-6S', protocol: ['DShot600', 'DShot300'], mountPattern: '30.5x30.5', blheli: 'BLHeli_S' } },
   { id: 'esc-sequre-e70-am32', name: 'SEQURE E70 G2 AM32 70A 4-in-1', description: '70A AM32 ESC with 8S support, adjustable 16-128KHz PWM, good value for high-power builds', cost: 4999, weight: 16, specs: { current: 70, voltage: '2-8S', protocol: ['DShot600', 'DShot300', 'DShot1200'], mountPattern: '30.5x30.5', blheli: 'AM32' } },
   { id: 'esc-tmotor-velox-v50a', name: 'T-Motor Velox V50A SE AM32 4-in-1', description: 'Mid-range T-Motor 50A AM32 ESC from the Velox line with solid thermal design', cost: 4499, weight: 13, specs: { current: 50, voltage: '3-6S', protocol: ['DShot600', 'DShot300', 'DShot1200'], mountPattern: '30.5x30.5', blheli: 'AM32' } },
+  { id: 'esc-hobbywing-g2-65a', name: 'Hobbywing XRotor FPV G2 65A 4-in-1', description: 'Race-grade 65A 4-in-1 with AT32 MCU, AM32 firmware, 6-layer 3oz copper PCB and 5V BEC; 60A continuous / 80A burst per motor', cost: 5999, weight: 15, specs: { current: 65, voltage: '3-6S', protocol: ['DShot600', 'DShot300'], mountPattern: '30.5x30.5', blheli: 'AM32' } },
+  { id: 'esc-hobbywing-g2-45a', name: 'Hobbywing XRotor FPV G2 45A 4-in-1', description: 'Lightweight 45A 4-in-1 with AT32 MCU and AM32 firmware, 45A continuous / 60A burst per motor — well suited to lighter 5" race builds', cost: 4499, weight: 12, specs: { current: 45, voltage: '3-6S', protocol: ['DShot600', 'DShot300'], mountPattern: '30.5x30.5', blheli: 'AM32' } },
   ],
 
   vtx: [
@@ -927,6 +931,9 @@ export const presets = {
   { id: 'tx-happymodel-es900tx', name: 'Happymodel ES900TX ELRS Module', description: 'Budget ELRS 900MHz TX module for JR bay radios, affordable long-range solution', cost: 2999, weight: 45, specs: { protocol: 'ELRS', frequency: '900MHz', channels: 16, display: 'None', gimbal: 'N/A' } },
   { id: 'tx-namimno-flash-oled-tx', name: 'NamimnoRC Flash OLED TX Module', description: 'Premium ELRS 2.4GHz TX module with OLED display and excellent RF output', cost: 3499, weight: 35, specs: { protocol: 'ELRS', frequency: '2.4GHz', channels: 16, display: 'OLED', gimbal: 'N/A' } },
   { id: 'tx-radiomaster-pocket-crush', name: 'RadioMaster Pocket Crush (ELRS)', description: 'Updated Pocket with X5 Hall gimbals, vibrant color options, EdgeTX pre-installed', cost: 6499, weight: 288, specs: { protocol: 'ELRS', frequency: '2.4GHz', channels: 16, display: 'Mono LCD', gimbal: 'Hall' } },
+  { id: 'tx-radiomaster-tx15', name: 'RadioMaster TX15 (ELRS)', description: 'Full-size dual-band ELRS radio with LR1121 transceiver (2.4GHz + 900MHz), 3.5" color touchscreen and V5 Hall gimbals, runs EdgeTX', cost: 13299, weight: 605, specs: { protocol: 'ELRS', frequency: '2.4GHz/900MHz', channels: 16, display: 'Color Touchscreen', gimbal: 'Hall' } },
+  { id: 'tx-radiomaster-tx15-max', name: 'RadioMaster TX15 Max (ELRS)', description: 'Premium TX15 with full-CNC AG02 Hall gimbals, RGB gimbal rings and anodized finishes; dual-band LR1121 ELRS and 3.5" color touchscreen', cost: 19999, weight: 672, specs: { protocol: 'ELRS', frequency: '2.4GHz/900MHz', channels: 16, display: 'Color Touchscreen', gimbal: 'Hall (AG02)' } },
+  { id: 'tx-radiomaster-tx16s-mk3', name: 'RadioMaster TX16S MK3 (ELRS)', description: 'Flagship full-size radio with STM32 H7, 5" 800x480 touchscreen, Gemini-X dual-band ELRS (dual LR1121) and V6 quad-bearing Hall gimbals', cost: 19999, weight: 700, specs: { protocol: 'ELRS', frequency: '2.4GHz/900MHz', channels: 16, display: 'Color Touchscreen', gimbal: 'Hall' } },
   ],
 
   goggles: [
@@ -1017,6 +1024,9 @@ export const presets = {
   { id: 'gog-dji-n3-goggles', name: 'DJI Goggles N3', description: 'Budget-friendly DJI goggles designed for the Neo series but compatible with O3.', cost: 22999, weight: 305, specs: { system: 'DJI', resolution: '1920x1080', fov: 44, dvr: true, diversity: false } },
   { id: 'gog-walksnail-l', name: 'Walksnail Avatar HD Goggles L', description: 'Budget single-screen Walksnail goggles with 4.5" 1080p display, head tracking, H.265', cost: 19999, weight: 350, specs: { system: 'Walksnail', resolution: '1920x1080', fov: 42, dvr: true, diversity: false } },
   { id: 'gog-skyzone-cobra-v4', name: 'Skyzone Cobra X V4', description: 'Updated Skyzone box goggles with 720p LCD, SteadyView V3.3 diversity, 60fps DVR, head tracker', cost: 19999, weight: 332, specs: { system: 'Analog', resolution: '1280x720', fov: 50, dvr: true, diversity: true } },
+  { id: 'gog-hdzero-goggle2', name: 'HDZero Goggle 2', description: 'Flagship HDZero goggles with 1080p 90Hz OLED micro-displays, 3ms glass-to-glass latency, built-in analog receiver and H.265 DVR', cost: 74999, weight: 200, specs: { system: 'HDZero', resolution: '1920x1080', fov: 46, dvr: true, diversity: true } },
+  { id: 'gog-hdzero-boxpro', name: 'HDZero BoxPro', description: 'All-in-one box goggles with a 100Hz 1800-nit LCD; built-in HDZero digital and analog receivers (4 antennas) plus HDMI in, with H.265 DVR', cost: 34999, weight: 420, specs: { system: 'HDZero', resolution: '1920x1080', fov: 56, dvr: true, diversity: true } },
+  { id: 'gog-hdzero-boxpro-plus', name: 'HDZero BoxPro+', description: 'BoxPro with added WiFi video streaming and an onboard ESP32 for ELRS backpack control; 100Hz 1800-nit LCD, digital/analog/HDMI input', cost: 39999, weight: 425, specs: { system: 'HDZero', resolution: '1920x1080', fov: 56, dvr: true, diversity: true } },
   ],
 
   vtxAntenna: [

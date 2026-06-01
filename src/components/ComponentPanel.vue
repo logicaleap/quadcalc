@@ -101,11 +101,10 @@ import { useStorage } from '../composables/useStorage.js'
 import { CATEGORY_MAP, formatCurrency, formatWeight } from '../utils/helpers.js'
 import { ICONS } from '../utils/icons.js'
 import { presets } from '../data/presets.js'
-import { compatibilityRules } from '../data/compatibilityRules.js'
 import ComponentSelector from './ComponentSelector.vue'
 
 const store = useBuildStore()
-const { alerts } = useCompatibility()
+const { alerts, isIncompatibleItem } = useCompatibility()
 const { getCustomPresets } = useStorage()
 const isMobile = inject('isMobile', ref(false))
 const hideIncompatible = ref(false)
@@ -135,34 +134,9 @@ const presetItems = computed(() => {
   return [...custom, ...builtIn]
 })
 
-// Rules that involve the current category, with the other category's component already selected
-const activeRules = computed(() => {
-  if (!store.selectedCategory) return []
-  return compatibilityRules
-    .filter(r => r.severity === 'error' && r.categories.includes(store.selectedCategory))
-    .map(r => {
-      const otherCat = r.categories[0] === store.selectedCategory ? r.categories[1] : r.categories[0]
-      const otherComp = store.components[otherCat]
-      if (!otherComp) return null
-      const thisIsFirst = r.categories[0] === store.selectedCategory
-      return { rule: r, otherComp, thisIsFirst }
-    })
-    .filter(Boolean)
-})
-
-function isIncompatible(item) {
-  const mockComp = { ...item, category: store.selectedCategory }
-  for (const { rule, otherComp, thisIsFirst } of activeRules.value) {
-    const a = thisIsFirst ? mockComp : otherComp
-    const b = thisIsFirst ? otherComp : mockComp
-    if (rule.check(a, b)) return true
-  }
-  return false
-}
-
 const displayItems = computed(() => {
   if (!hideIncompatible.value) return presetItems.value
-  return presetItems.value.filter(item => !isIncompatible(item))
+  return presetItems.value.filter(item => !isIncompatibleItem(store.selectedCategory, item))
 })
 
 const relatedAlerts = computed(() => {

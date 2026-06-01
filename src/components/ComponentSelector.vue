@@ -48,9 +48,12 @@
           :class="{ 'border-tron-cyan/50 bg-tron-cyan/10 selected-item': selected?.id === item.id }"
           @click="$emit('select', item)"
         >
-          <div class="flex items-center justify-between">
-            <span class="text-tron-text-bright text-sm font-semibold font-[Rajdhani]">{{ item.name }}</span>
-            <span class="text-tron-cyan text-xs font-mono">{{ formatCost(item.cost) }}</span>
+          <div class="flex items-center justify-between gap-2">
+            <span class="flex items-center gap-1.5 min-w-0">
+              <span class="text-tron-text-bright text-sm font-semibold font-[Rajdhani] truncate">{{ item.name }}</span>
+              <span v-if="bundledBadge(item)" class="aio-badge" :title="bundledTitle(item)">{{ bundledBadge(item) }}</span>
+            </span>
+            <span class="text-tron-cyan text-xs font-mono shrink-0">{{ formatCost(item.cost) }}</span>
           </div>
           <p class="text-xs text-tron-text/60 mt-0.5">{{ item.description }}</p>
           <div class="flex flex-wrap gap-1 mt-1">
@@ -138,7 +141,9 @@ const filtered = computed(() => {
     items = items.filter(item =>
       item.name.toLowerCase().includes(q) ||
       item.description?.toLowerCase().includes(q) ||
-      Object.values(item.specs || {}).some(v => String(v).toLowerCase().includes(q))
+      Object.values(item.specs || {}).some(v => String(v).toLowerCase().includes(q)) ||
+      // Boolean feature flags (e.g. aio, aioVtx, aioRx) are searchable by key name
+      Object.entries(item.specs || {}).some(([k, v]) => v === true && k.toLowerCase().includes(q))
     )
   }
   if (activeGroup.value) {
@@ -194,6 +199,27 @@ const totalCount = computed(() => sorted.value.length)
 
 function formatCost(cents) {
   return formatCurrency(cents)
+}
+
+// All-in-one badge: shows which parts are built into a board (FCs only).
+// e.g. "AIO · ESC+VTX+RX". Returns null for non-bundled components.
+function bundledParts(item) {
+  const s = item.specs || {}
+  const parts = []
+  if (s.aio) parts.push('ESC')
+  if (s.aioVtx) parts.push('VTX')
+  if (s.aioRx) parts.push('RX')
+  return parts
+}
+function bundledBadge(item) {
+  const parts = bundledParts(item)
+  return parts.length ? `AIO · ${parts.join('+')}` : null
+}
+function bundledTitle(item) {
+  const parts = bundledParts(item)
+  if (!parts.length) return ''
+  const names = { ESC: 'ESC', VTX: 'video transmitter', RX: 'receiver' }
+  return `All-in-one board — ${parts.map(p => names[p]).join(', ')} built in (those steps are auto-filled)`
 }
 
 function heroSpecs(item) {
@@ -319,5 +345,17 @@ function secondarySpecs(item) {
   color: var(--qc-cyan-05);
   border-color: var(--qc-cyan-015);
   background: var(--qc-cyan-008);
+}
+
+.aio-badge {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+  padding: 1px 6px;
+  color: var(--qc-green);
+  background: var(--qc-green-008);
+  border: 1px solid var(--qc-green-02);
+  white-space: nowrap;
 }
 </style>

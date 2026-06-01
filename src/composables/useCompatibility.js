@@ -49,6 +49,28 @@ export function useCompatibility() {
     return Math.round((passing / applicable) * 100)
   })
 
+  // Would assigning `item` to `category` break a hard (error) compatibility rule
+  // against what's already in the build? Used to filter the selector to
+  // compatible-only options. Shared by ComponentPanel and the guided wizard.
+  // `restrictTo`, if provided, limits which other categories are considered —
+  // the guided wizard passes only earlier steps so a part is never filtered
+  // against a choice that comes later in the flow.
+  function isIncompatibleItem(category, item, restrictTo = null) {
+    const mock = { ...item, category }
+    for (const rule of compatibilityRules) {
+      if (rule.severity !== 'error' || !rule.categories.includes(category)) continue
+      const otherCat = rule.categories[0] === category ? rule.categories[1] : rule.categories[0]
+      if (restrictTo && !restrictTo.has(otherCat)) continue
+      const otherComp = store.components[otherCat]
+      if (!otherComp) continue
+      const thisIsFirst = rule.categories[0] === category
+      const a = thisIsFirst ? mock : otherComp
+      const b = thisIsFirst ? otherComp : mock
+      if (rule.check(a, b)) return true
+    }
+    return false
+  }
+
   // Get status for a specific category (for node coloring)
   function getCategoryStatus(category) {
     if (!store.components[category]) return 'empty'
@@ -65,5 +87,6 @@ export function useCompatibility() {
     infos,
     compatibilityScore,
     getCategoryStatus,
+    isIncompatibleItem,
   }
 }

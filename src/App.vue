@@ -5,7 +5,15 @@
     <!-- Top bar -->
     <header class="top-bar">
       <div class="title-block flex items-center gap-3">
-        <div>
+        <div
+          class="logo-btn"
+          role="button"
+          tabindex="0"
+          title="About QuadCalc"
+          @click="showCredits = true"
+          @keydown.enter="showCredits = true"
+          @keydown.space.prevent="showCredits = true"
+        >
           <h1 class="text-tron-cyan text-base font-bold tracking-widest glow-text-cyan">QUADCALC</h1>
           <span class="browser-storage-note">FPV BUILD PLANNER</span>
         </div>
@@ -38,6 +46,7 @@
           </button>
         </div>
         <div class="primary-actions">
+          <button class="btn-guided tron-btn text-xs guided-btn" @click="showWizard = true" title="Step-by-step guided build for beginners">GUIDED BUILD</button>
           <button class="btn-import tron-btn text-xs" @click="showUrlImport = true">IMPORT URL</button>
           <button class="btn-builds tron-btn text-xs" @click="showSaveLoad = true">BUILDS</button>
           <button
@@ -72,6 +81,10 @@
               <h2 class="onboarding-title">BUILD YOUR QUAD</h2>
               <p class="onboarding-subtitle">Pick a starting point</p>
             </div>
+            <button class="onboarding-guided-btn" @click="startGuided">
+              <span class="guided-label">⭐ Guided Build</span>
+              <span class="guided-hint">New to FPV? We'll walk you through each part, step by step</span>
+            </button>
             <div class="onboarding-action-row">
               <button class="onboarding-scratch-btn" @click="startFromScratch">
                 <span class="scratch-label">Start from Scratch</span>
@@ -125,6 +138,8 @@
     <HelpModal :show="showHelp" @close="showHelp = false" />
     <FeedbackModal :show="showFeedback" @close="showFeedback = false" />
     <ExportModal :show="showExport" @close="showExport = false" />
+    <BuildWizard :show="showWizard" @close="showWizard = false" />
+    <CreditsModal :show="showCredits" @close="showCredits = false" @request-feedback="showFeedback = true" />
 
     <!-- Guided Tour -->
     <GuidedTour :active="showTour" @end="showTour = false" />
@@ -150,6 +165,8 @@ import UrlImportModal from './components/UrlImportModal.vue'
 import HelpModal from './components/HelpModal.vue'
 import FeedbackModal from './components/FeedbackModal.vue'
 import ExportModal from './components/ExportModal.vue'
+import BuildWizard from './components/BuildWizard.vue'
+import CreditsModal from './components/CreditsModal.vue'
 import GuidedTour from './components/GuidedTour.vue'
 
 const store = useBuildStore()
@@ -170,6 +187,8 @@ const showUrlImport = ref(false)
 const showHelp = ref(false)
 const showFeedback = ref(false)
 const showExport = ref(false)
+const showWizard = ref(false)
+const showCredits = ref(false)
 const showTour = ref(false)
 
 const appVersion = __APP_VERSION__
@@ -182,6 +201,11 @@ const dismissedOnboarding = ref(false)
 
 function startFromScratch() {
   dismissedOnboarding.value = true
+}
+
+function startGuided() {
+  dismissedOnboarding.value = true
+  showWizard.value = true
 }
 
 function loadStarterBuild(tpl) {
@@ -246,6 +270,20 @@ provide('openSettings', () => { showSettings.value = true })
   align-items: center;
   justify-content: center;
   padding: 20px;
+}
+
+.logo-btn {
+  cursor: pointer;
+  outline: none;
+  transition: filter 0.2s, opacity 0.2s;
+}
+.logo-btn:hover,
+.logo-btn:focus-visible {
+  filter: brightness(1.15);
+}
+.logo-btn:focus-visible {
+  outline: 1px solid var(--qc-cyan-03);
+  outline-offset: 3px;
 }
 
 .browser-storage-note {
@@ -322,12 +360,24 @@ provide('openSettings', () => { showSettings.value = true })
   display: contents;
 }
 .btn-theme { order: 0; }
-.btn-import { order: 1; }
-.btn-builds { order: 2; }
-.btn-settings { order: 3; }
-.btn-help { order: 4; }
-.btn-feedback { order: 5; }
-.export-btn { order: 6; }
+.btn-builds { order: 1; }
+.btn-guided { order: 2; }
+.btn-import { order: 3; }
+.btn-settings { order: 4; }
+.btn-help { order: 5; }
+.btn-feedback { order: 6; }
+.export-btn { order: 7; }
+
+/* Guided Build — beginner CTA, subtly accented */
+.guided-btn {
+  border-color: var(--qc-cyan-03);
+  color: var(--qc-cyan);
+}
+.guided-btn:hover {
+  background: var(--qc-cyan-015);
+  border-color: var(--qc-cyan);
+  box-shadow: var(--qc-glow-cyan);
+}
 
 /* Onboarding overlay */
 .onboarding-overlay {
@@ -364,6 +414,39 @@ provide('openSettings', () => { showSettings.value = true })
   margin: 0;
   opacity: 0.7;
 }
+.onboarding-guided-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  background: var(--qc-cyan-015);
+  border: 1px solid var(--qc-cyan);
+  color: var(--qc-cyan);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--qc-glow-cyan);
+}
+.onboarding-guided-btn:hover {
+  background: var(--qc-cyan-02);
+  transform: translateY(-1px);
+  box-shadow: var(--qc-glow-cyan-strong);
+}
+.guided-label {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.guided-hint {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  color: var(--qc-text);
+  opacity: 0.7;
+}
+
 .onboarding-action-row {
   display: flex;
   gap: 8px;
@@ -504,12 +587,21 @@ provide('openSettings', () => { showSettings.value = true })
 }
 .app-root.mobile .primary-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  flex-wrap: nowrap;
+  gap: 6px;
   order: 3;
   flex-basis: 100%;
   justify-content: center;
+  overflow-x: auto;
 }
+/* Tighten the primary buttons so all four fit one line on a phone */
+.app-root.mobile .primary-actions .tron-btn {
+  padding: 0.4rem 0.55rem;
+  font-size: 11px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.app-root.mobile .primary-actions .export-btn { gap: 4px; }
 .app-root.mobile .build-summary {
   order: 2;
 }
@@ -521,7 +613,9 @@ provide('openSettings', () => { showSettings.value = true })
   top: auto;
   flex: 1;
   min-height: 0;
-  padding: 10px;
+  /* Reserve room at the bottom for the alerts/wiring overlay so the diagram
+     centres in the visible space above it instead of hiding behind it. */
+  padding: 10px 10px 22vh;
   order: 3;
 }
 .app-root.mobile .onboarding-overlay {

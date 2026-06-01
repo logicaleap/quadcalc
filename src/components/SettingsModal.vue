@@ -20,9 +20,23 @@
                 class="tron-input w-full text-sm"
                 placeholder="sk-or-..."
               />
-              <p class="text-[10px] text-tron-text/30 mt-1">
-                Get a key at <span class="text-tron-cyan/50">openrouter.ai</span>. Stored locally in your browser only.
-              </p>
+              <div class="api-help">
+                <p class="api-help-intro">
+                  The AI assistant runs on your own free
+                  <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> key:
+                </p>
+                <ol class="api-help-steps">
+                  <li>Create a free account at <a href="https://openrouter.ai" target="_blank" rel="noopener">openrouter.ai</a></li>
+                  <li>Open <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a> → <span class="kbd">Create Key</span></li>
+                  <li>Copy it (starts with <code>sk-or-</code>) and paste above</li>
+                </ol>
+                <p class="api-help-note">
+                  Pick a free model below to avoid charges. Your key is stored only in this browser and is sent only to OpenRouter.
+                </p>
+                <a class="api-help-cta" href="https://openrouter.ai/keys" target="_blank" rel="noopener">
+                  Get a free key →
+                </a>
+              </div>
             </div>
 
             <!-- Model selector -->
@@ -110,6 +124,63 @@ select.tron-input {
 select.tron-input option {
   background: var(--qc-select-bg);
   color: var(--qc-select-text);
+}
+
+/* API key help */
+.api-help {
+  margin-top: 8px;
+  font-family: 'Share Tech Mono', monospace;
+}
+.api-help-intro {
+  font-size: 10px;
+  color: var(--qc-text-muted);
+  margin: 0 0 4px;
+}
+.api-help-steps {
+  margin: 0;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--qc-text);
+  list-style: decimal;
+}
+.api-help-steps li::marker {
+  color: var(--qc-cyan-05);
+}
+.api-help code {
+  background: var(--qc-cyan-008);
+  padding: 0 3px;
+  color: var(--qc-cyan-05);
+}
+.api-help .kbd {
+  border: 1px solid var(--qc-cyan-02);
+  padding: 0 4px;
+  color: var(--qc-cyan-05);
+}
+.api-help a {
+  color: var(--qc-cyan);
+  text-decoration: none;
+  border-bottom: 1px solid var(--qc-cyan-03);
+}
+.api-help a:hover {
+  text-shadow: var(--qc-glow-text-cyan);
+  border-bottom-color: var(--qc-cyan);
+}
+.api-help-note {
+  font-size: 9px;
+  color: var(--qc-text-muted);
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+.api-help-cta {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .modal-enter-active, .modal-leave-active {

@@ -23,7 +23,20 @@
 
         <!-- Messages -->
         <div class="messages" ref="messagesRef">
-          <div v-if="messages.length === 0" class="empty-state">
+          <!-- No API key yet -->
+          <div v-if="!hasKey" class="nokey-card">
+            <div class="nokey-title">AI needs a free API key</div>
+            <p class="nokey-text">
+              The assistant uses your own free <strong>OpenRouter</strong> key — it stays in this browser.
+            </p>
+            <ol class="nokey-steps">
+              <li>Create a key at <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a></li>
+              <li>Paste it into Settings</li>
+            </ol>
+            <button class="tron-btn-success tron-btn nokey-btn" @click="addKey">ADD API KEY</button>
+          </div>
+
+          <div v-else-if="messages.length === 0" class="empty-state">
             <div class="text-tron-text/30 text-xs mb-3">
               Ask about your build — compatibility, suggestions, or anything FPV.
             </div>
@@ -80,19 +93,32 @@
 import { ref, nextTick, watch, computed, inject } from 'vue'
 import { useAi } from '../composables/useAi.js'
 import { useTheme } from '../composables/useTheme.js'
+import { useStorage } from '../composables/useStorage.js'
 
 const { messages, loading, error, needsApiKey, sendMessage, clearChat } = useAi()
+const { getSettings } = useStorage()
 const openSettings = inject('openSettings', null)
 const { isDark } = useTheme()
 
+// Whether an OpenRouter key is configured (re-checked when the panel opens,
+// since the key may have just been added in Settings).
+const hasKey = ref(!!getSettings().apiKey)
+function refreshKey() { hasKey.value = !!getSettings().apiKey }
+
 watch(needsApiKey, (val) => {
   if (val) {
+    refreshKey()
     openSettings?.()
     needsApiKey.value = false
   }
 })
 
 const isOpen = ref(false)
+watch(isOpen, (open) => { if (open) refreshKey() })
+
+function addKey() {
+  openSettings?.()
+}
 const input = ref('')
 const messagesRef = ref(null)
 const panelSize = ref('default') // 'default' | 'half' | 'full'
@@ -118,6 +144,12 @@ function cycleSize() {
 async function send() {
   const text = input.value.trim()
   if (!text || loading.value) return
+  refreshKey()
+  if (!hasKey.value) {
+    // Keep the typed text so the user can resend after adding a key
+    openSettings?.()
+    return
+  }
   input.value = ''
   await sendMessage(text)
   await nextTick()
@@ -227,6 +259,52 @@ watch(messages, () => {
 .empty-state {
   text-align: center;
   padding: 24px 8px;
+}
+
+/* No-API-key card */
+.nokey-card {
+  margin: 8px;
+  padding: 14px;
+  border: 1px solid var(--qc-cyan-02);
+  background: var(--qc-cyan-005);
+  text-align: center;
+}
+.nokey-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--qc-cyan);
+  letter-spacing: 0.5px;
+  text-shadow: var(--qc-glow-text-cyan);
+  margin-bottom: 6px;
+}
+.nokey-text {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--qc-text);
+  margin: 0 0 8px;
+}
+.nokey-steps {
+  text-align: left;
+  margin: 0 auto 10px;
+  padding-left: 18px;
+  max-width: 240px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--qc-text);
+  list-style: decimal;
+}
+.nokey-steps li::marker { color: var(--qc-cyan-05); }
+.nokey-steps a {
+  color: var(--qc-cyan);
+  text-decoration: none;
+  border-bottom: 1px solid var(--qc-cyan-03);
+}
+.nokey-steps a:hover { text-shadow: var(--qc-glow-text-cyan); }
+.nokey-btn {
+  width: 100%;
+  font-size: 11px;
 }
 
 .message {

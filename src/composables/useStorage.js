@@ -12,6 +12,36 @@ const STORAGE_KEY = 'quadcalc_builds'
 const SETTINGS_KEY = 'quadcalc_settings'
 const CUSTOM_PRESETS_KEY = 'quadcalc_custom_presets'
 
+// Quantity needed per build (most parts ×1; you fly 4 motors; props sell as sets of 4)
+export function quantityFor(category) {
+  if (category === 'motors') return { count: 4, multiplyPrice: true, note: '×4' }
+  if (category === 'propellers') return { count: 4, multiplyPrice: false, note: 'set of 4' }
+  return { count: 1, multiplyPrice: false, note: '' }
+}
+
+// Best-effort "find this part" search link (no vendor URLs in the dataset)
+export function partSearchUrl(name) {
+  return 'https://www.google.com/search?q=' + encodeURIComponent(`${name} fpv`)
+}
+
+function csvCell(value) {
+  return `"${String(value).replace(/"/g, '""')}"`
+}
+
+// iMessage/iOS truncates URLs that contain an unbroken base64 segment > ~300
+// chars. Inserting a '.' every 280 chars breaks it into shorter segments — '.'
+// isn't in the base64url alphabet, so it's stripped cleanly on decode.
+// (Same approach proven in the p2pbg project.)
+const IMESSAGE_CHUNK = 280
+function chunkForImessage(b64url) {
+  if (b64url.length <= IMESSAGE_CHUNK) return b64url
+  const chunks = []
+  for (let i = 0; i < b64url.length; i += IMESSAGE_CHUNK) {
+    chunks.push(b64url.slice(i, i + IMESSAGE_CHUNK))
+  }
+  return chunks.join('.')
+}
+
 export function useStorage() {
   const savedBuilds = ref([])
 
@@ -53,54 +83,94 @@ export function useStorage() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(savedBuilds.value))
   }
 
-  function exportBuildToFile() {
-    const store = useBuildStore()
-    const build = store.exportBuild()
-    const json = JSON.stringify(build, null, 2)
-    const blob = new Blob([json], { type: 'application/json' })
+  function downloadFile(filename, text, mime) {
+    const blob = new Blob([text], { type: mime })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${build.name.replace(/[^a-z0-9]/gi, '_')}.json`
+    a.download = filename
     a.click()
     URL.revokeObjectURL(url)
   }
 
-  function exportBuildToCsv() {
+  function safeFileName() {
     const store = useBuildStore()
-    const rows = [['Category', 'Component', 'Description', 'Cost', 'Weight', 'Specs']]
+    return (store.buildName || 'quadcalc-build').replace(/[^a-z0-9]/gi, '_')
+  }
+
+  // --- String builders (shared by preview, copy, and download) ---
+
+  function buildJsonString() {
+    const store = useBuildStore()
+    return JSON.stringify(store.exportBuild(), null, 2)
+  }
+
+  function buildCsvString() {
+    const store = useBuildStore()
+    const rows = [['Category', 'Component', 'Qty', 'Description', 'Cost', 'Weight', 'Specs', 'Search']]
     for (const cat of CATEGORIES) {
       const comp = store.components[cat.key]
       if (comp) {
+        const qty = quantityFor(comp.category)
+        const linePrice = comp.cost != null ? (qty.multiplyPrice ? comp.cost * qty.count : comp.cost) : null
         const specsStr = comp.specs
           ? Object.entries(comp.specs).map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join('/') : v}`).join('; ')
           : ''
         rows.push([
           cat.label,
           comp.name,
+          qty.note || '1',
           comp.description || '',
-          formatCurrency(comp.cost),
+          formatCurrency(linePrice),
           formatWeight(comp.weight),
           specsStr,
+          partSearchUrl(comp.name),
         ])
       } else {
-        rows.push([cat.label, '(empty)', '', '', '', ''])
+        rows.push([cat.label, '(empty)', '', '', '', '', '', ''])
       }
     }
-    // Summary row
     rows.push([])
-    rows.push(['TOTAL', '', '', formatCurrency(store.totalCost), formatWeight(store.totalWeight), ''])
+    rows.push(['TOTAL', '', '', '', formatCurrency(store.totalCost), formatWeight(store.totalWeight), '', ''])
     rows.push(['Build Name', store.buildName])
     rows.push(['Parts', `${store.filledCount} / ${CATEGORIES.length}`])
+    return rows.map(r => r.map(csvCell).join(',')).join('\n')
+  }
 
-    const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${store.buildName.replace(/[^a-z0-9]/gi, '_')}.csv`
-    a.click()
-    URL.revokeObjectURL(url)
+  function buildShoppingMarkdown({ links = true } = {}) {
+    const store = useBuildStore()
+    const lines = [
+      `## Shopping List — ${store.buildName}`,
+      '',
+      '| Part | Component | Qty | Price |',
+      '|---|---|---|---|',
+    ]
+    let total = 0
+    for (const cat of CATEGORIES) {
+      const comp = store.components[cat.key]
+      if (!comp) continue
+      const qty = quantityFor(comp.category)
+      const price = comp.cost != null ? (qty.multiplyPrice ? comp.cost * qty.count : comp.cost) : 0
+      total += price
+      const name = links ? `[${comp.name}](${partSearchUrl(comp.name)})` : comp.name
+      const priceStr = comp.cost != null ? formatCurrency(price) : '—'
+      lines.push(`| ${cat.label} | ${name} | ${qty.note || '1'} | ${priceStr} |`)
+    }
+    lines.push(`| **Total** | | | **${formatCurrency(total)}** |`)
+    lines.push('', `*Generated by QuadCalc — ${new Date().toLocaleDateString()}*`)
+    return lines.join('\n')
+  }
+
+  function exportBuildToFile() {
+    downloadFile(`${safeFileName()}.json`, buildJsonString(), 'application/json')
+  }
+
+  function exportBuildToCsv() {
+    downloadFile(`${safeFileName()}.csv`, buildCsvString(), 'text/csv')
+  }
+
+  function exportShoppingListToFile() {
+    downloadFile(`${safeFileName()}.md`, buildShoppingMarkdown(), 'text/markdown')
   }
 
   function importBuildFromFile(file) {
@@ -132,7 +202,7 @@ export function useStorage() {
       }
     }
     const encoded = btoa(JSON.stringify(ids)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
-    return `${window.location.origin}${window.location.pathname}#build=${encoded}`
+    return `${window.location.origin}${window.location.pathname}#build=${chunkForImessage(encoded)}`
   }
 
   function loadBuildFromUrl(hash) {
@@ -140,7 +210,9 @@ export function useStorage() {
     const match = hash.match(/#build=(.+)/)
     if (!match) return false
     try {
-      const b64 = match[1].replace(/-/g, '+').replace(/_/g, '/')
+      // Strip any '.' chunk separators (iMessage-safe encoding), then base64url-decode
+      let b64 = match[1].replace(/\./g, '').replace(/-/g, '+').replace(/_/g, '/')
+      while (b64.length % 4) b64 += '='
       const ids = JSON.parse(atob(b64))
       const comps = {}
       for (const [shortKey, presetId] of Object.entries(ids)) {
@@ -175,21 +247,7 @@ export function useStorage() {
   }
 
   async function copyShoppingList() {
-    const store = useBuildStore()
-    let lines = [`## Shopping List — ${store.buildName}`, '', '| Part | Component | Price |', '|---|---|---|']
-    let total = 0
-    for (const cat of CATEGORIES) {
-      const comp = store.components[cat.key]
-      if (!comp) continue
-      const isMultiplied = comp.category === 'motors'
-      const price = comp.cost ? (isMultiplied ? comp.cost * 4 : comp.cost) : 0
-      total += price
-      const priceStr = comp.cost ? `${formatCurrency(price)}${isMultiplied ? ' (x4)' : ''}` : '—'
-      lines.push(`| ${cat.label} | ${comp.name} | ${priceStr} |`)
-    }
-    lines.push(`| **Total** | | **${formatCurrency(total)}** |`)
-    lines.push('', `*Generated by QuadCalc — ${new Date().toLocaleDateString()}*`)
-    const text = lines.join('\n')
+    const text = buildShoppingMarkdown()
     await navigator.clipboard.writeText(text)
     return text
   }
@@ -264,6 +322,10 @@ export function useStorage() {
     deleteBuild,
     exportBuildToFile,
     exportBuildToCsv,
+    exportShoppingListToFile,
+    buildJsonString,
+    buildCsvString,
+    buildShoppingMarkdown,
     importBuildFromFile,
     copyShoppingList,
     generateShareUrl,

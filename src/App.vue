@@ -4,73 +4,55 @@
 
     <!-- Top bar -->
     <header class="top-bar">
-      <div class="flex items-center gap-3">
+      <div class="title-block flex items-center gap-3">
         <div>
           <h1 class="text-tron-cyan text-base font-bold tracking-widest glow-text-cyan">QUADCALC</h1>
           <span class="browser-storage-note">FPV BUILD PLANNER</span>
         </div>
         <span class="text-tron-text/20 text-xs font-mono hidden sm:inline">All data saved locally in your browser</span>
       </div>
-      <div class="flex items-center gap-2">
-        <button class="theme-toggle tron-btn text-xs" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
-          <svg v-if="isDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-          </svg>
-          <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-        </button>
-        <button class="tron-btn text-xs" @click="showUrlImport = true">IMPORT URL</button>
-        <button class="tron-btn text-xs" @click="showSaveLoad = true">BUILDS</button>
-        <button class="theme-toggle tron-btn text-xs" @click="showSettings = true" title="Settings">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
-          </svg>
-        </button>
-        <button class="theme-toggle tron-btn text-xs" @click="showHelp = true" title="Help">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-        </button>
-        <button class="theme-toggle tron-btn text-xs" @click="showFeedback = true" title="Send feedback">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        </button>
-        <div class="share-wrapper" ref="shareWrapperRef">
+      <div class="flex items-center gap-2 top-actions">
+        <div class="utility-icons">
+          <button class="btn-theme theme-toggle tron-btn text-xs" @click="toggleTheme" :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'">
+            <svg v-if="isDark" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg v-else width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+          <button class="btn-settings theme-toggle tron-btn text-xs" @click="showSettings = true" title="Settings">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+          <button class="btn-help theme-toggle tron-btn text-xs" @click="showHelp = true" title="Help">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </button>
+          <button class="btn-feedback theme-toggle tron-btn text-xs" @click="showFeedback = true" title="Send feedback">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </button>
+        </div>
+        <div class="primary-actions">
+          <button class="btn-import tron-btn text-xs" @click="showUrlImport = true">IMPORT URL</button>
+          <button class="btn-builds tron-btn text-xs" @click="showSaveLoad = true">BUILDS</button>
           <button
-            class="theme-toggle tron-btn text-xs"
-            :class="{ active: showShareMenu }"
-            @click="showShareMenu = !showShareMenu"
-            title="Export / Share"
+            class="tron-btn text-xs export-btn"
+            :class="{ active: showExport }"
+            @click="showExport = true"
+            title="Export build & parts list"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
               <polyline points="16 6 12 2 8 6"/>
               <line x1="12" y1="2" x2="12" y2="15"/>
             </svg>
+            <span>EXPORT</span>
           </button>
-          <Transition name="dropdown">
-            <div v-if="showShareMenu" class="share-dropdown tron-panel">
-              <button class="share-option" @click="handleShareLink">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                <span>{{ shareFeedback || shareLabel }}</span>
-              </button>
-              <button class="share-option" @click="handleShoppingList">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-                <span>{{ shoppingFeedback || 'SHOPPING LIST' }}</span>
-              </button>
-              <div class="share-divider"></div>
-              <button class="share-option" @click="handleExportJson">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>EXPORT JSON</span>
-              </button>
-              <button class="share-option" @click="handleExportCsv">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                <span>EXPORT CSV</span>
-              </button>
-            </div>
-          </Transition>
         </div>
       </div>
     </header>
@@ -142,6 +124,7 @@
     <UrlImportModal :show="showUrlImport" @close="showUrlImport = false" />
     <HelpModal :show="showHelp" @close="showHelp = false" />
     <FeedbackModal :show="showFeedback" @close="showFeedback = false" />
+    <ExportModal :show="showExport" @close="showExport = false" />
 
     <!-- Guided Tour -->
     <GuidedTour :active="showTour" @end="showTour = false" />
@@ -166,10 +149,11 @@ import SettingsModal from './components/SettingsModal.vue'
 import UrlImportModal from './components/UrlImportModal.vue'
 import HelpModal from './components/HelpModal.vue'
 import FeedbackModal from './components/FeedbackModal.vue'
+import ExportModal from './components/ExportModal.vue'
 import GuidedTour from './components/GuidedTour.vue'
 
 const store = useBuildStore()
-const { loadBuildFromUrl, generateShareUrl, copyShareUrl, copyShoppingList, exportBuildToFile, exportBuildToCsv } = useStorage()
+const { loadBuildFromUrl } = useStorage()
 const { isDark, initTheme, toggleTheme } = useTheme()
 
 onMounted(() => {
@@ -178,7 +162,6 @@ onMounted(() => {
     const loaded = loadBuildFromUrl(window.location.hash)
     if (loaded) history.replaceState(null, '', window.location.pathname)
   }
-  document.addEventListener('click', closeShareOnClickOutside, true)
 })
 
 const showSaveLoad = ref(false)
@@ -186,52 +169,8 @@ const showSettings = ref(false)
 const showUrlImport = ref(false)
 const showHelp = ref(false)
 const showFeedback = ref(false)
+const showExport = ref(false)
 const showTour = ref(false)
-
-// Share dropdown
-const showShareMenu = ref(false)
-const shareWrapperRef = ref(null)
-const shareFeedback = ref('')
-const shoppingFeedback = ref('')
-const shareLabel = navigator.share ? 'SHARE' : 'COPY LINK'
-
-function closeShareOnClickOutside(e) {
-  if (showShareMenu.value && shareWrapperRef.value && !shareWrapperRef.value.contains(e.target)) {
-    showShareMenu.value = false
-  }
-}
-
-async function handleShareLink() {
-  const url = generateShareUrl()
-  if (navigator.share) {
-    showShareMenu.value = false
-    try {
-      await navigator.share({ title: store.buildName, url })
-    } catch {
-      // User cancelled the share sheet — no action needed
-    }
-  } else {
-    await navigator.clipboard.writeText(url)
-    shareFeedback.value = 'COPIED!'
-    setTimeout(() => { shareFeedback.value = ''; showShareMenu.value = false }, 1200)
-  }
-}
-
-async function handleShoppingList() {
-  await copyShoppingList()
-  shoppingFeedback.value = 'COPIED!'
-  setTimeout(() => { shoppingFeedback.value = ''; showShareMenu.value = false }, 1200)
-}
-
-function handleExportJson() {
-  exportBuildToFile()
-  showShareMenu.value = false
-}
-
-function handleExportCsv() {
-  exportBuildToCsv()
-  showShareMenu.value = false
-}
 
 const appVersion = __APP_VERSION__
 
@@ -268,7 +207,6 @@ function onMqChange(e) { isMobile.value = e.matches }
 mq.addEventListener('change', onMqChange)
 onUnmounted(() => {
   mq.removeEventListener('change', onMqChange)
-  document.removeEventListener('click', closeShareOnClickOutside, true)
 })
 
 provide('isMobile', isMobile)
@@ -364,75 +302,32 @@ provide('openSettings', () => { showSettings.value = true })
   pointer-events: none;
 }
 
-/* Share button & dropdown */
-.share-wrapper {
-  position: relative;
+/* Export button */
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
-.share-wrapper .active {
+.export-btn.active {
   background: var(--qc-cyan-015);
   border-color: var(--qc-cyan);
   box-shadow: var(--qc-glow-cyan);
 }
-.share-dropdown {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 30;
-  min-width: 160px;
-  padding: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.share-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  background: transparent;
-  border: none;
-  color: var(--color-tron-text-bright);
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.15s;
-  white-space: nowrap;
-  text-align: left;
-}
-.share-option:hover {
-  background: var(--qc-cyan-015);
-  color: var(--qc-cyan);
-}
-.share-option svg {
-  flex-shrink: 0;
-  opacity: 0.6;
-}
-.share-option:hover svg {
-  opacity: 1;
-}
-.share-divider {
-  height: 1px;
-  background: var(--qc-cyan-01);
-  margin: 2px 6px;
-}
 
-/* Dropdown transition */
-.dropdown-enter-active {
-  transition: all 0.15s ease-out;
+/* Top-bar action grouping.
+   On desktop the two groups collapse (display:contents) so all buttons sit in
+   one row; `order` reproduces the original interleaved sequence exactly. */
+.utility-icons,
+.primary-actions {
+  display: contents;
 }
-.dropdown-leave-active {
-  transition: all 0.1s ease-in;
-}
-.dropdown-enter-from {
-  opacity: 0;
-  transform: translateY(-4px);
-}
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-4px);
-}
+.btn-theme { order: 0; }
+.btn-import { order: 1; }
+.btn-builds { order: 2; }
+.btn-settings { order: 3; }
+.btn-help { order: 4; }
+.btn-feedback { order: 5; }
+.export-btn { order: 6; }
 
 /* Onboarding overlay */
 .onboarding-overlay {
@@ -585,11 +480,35 @@ provide('openSettings', () => { showSettings.value = true })
 }
 .app-root.mobile .top-bar {
   position: sticky;
+  flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
+  align-items: center;
+  gap: 6px 8px;
   padding: 8px 12px;
   order: 1;
+}
+/* Row 1: title (left) + utility icons (right). Row 2: primary actions, centered.
+   top-actions collapses so its two groups become direct children of top-bar. */
+.app-root.mobile .top-actions {
+  display: contents;
+}
+.app-root.mobile .title-block {
+  order: 1;
+  flex: 1 1 auto;
+}
+.app-root.mobile .utility-icons {
+  display: flex;
+  gap: 6px;
+  order: 2;
+  justify-content: flex-end;
+}
+.app-root.mobile .primary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  order: 3;
+  flex-basis: 100%;
+  justify-content: center;
 }
 .app-root.mobile .build-summary {
   order: 2;

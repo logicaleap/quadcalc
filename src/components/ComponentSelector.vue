@@ -46,12 +46,21 @@
           :key="item.id"
           class="preset-item p-2 cursor-pointer tron-border transition-all hover:border-tron-cyan/50 hover:bg-tron-cyan/5 group"
           :class="{ 'border-tron-cyan/50 bg-tron-cyan/10 selected-item': selected?.id === item.id }"
-          @click="$emit('select', item)"
+          @click="selectItem(item)"
+          @mouseenter="onRowEnter(item, $event)"
+          @mousemove="onRowMove($event)"
+          @mouseleave="onRowLeave"
         >
           <div class="flex items-center justify-between gap-2">
             <span class="flex items-center gap-1.5 min-w-0">
               <span class="text-tron-text-bright text-sm font-semibold font-[Rajdhani] truncate">{{ item.name }}</span>
               <span v-if="bundledBadge(item)" class="aio-badge" :title="bundledTitle(item)">{{ bundledBadge(item) }}</span>
+              <span v-if="item.image" class="img-badge" :title="`Hover to preview ${item.name}`">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                </svg>
+                PHOTO
+              </span>
             </span>
             <span class="text-tron-cyan text-xs font-mono shrink-0">{{ formatCost(item.cost) }}</span>
           </div>
@@ -79,6 +88,13 @@
         No matching components
       </div>
     </div>
+
+    <!-- Hover image preview (frames etc. that have an image) -->
+    <Teleport to="body">
+      <div v-if="previewItem" class="img-preview" :style="previewStyle">
+        <img :src="imgSrc(previewItem.image)" :alt="previewItem.name" />
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -92,17 +108,55 @@ const props = defineProps({
   category: { type: String, default: '' },
 })
 
-defineEmits(['select'])
+const emit = defineEmits(['select'])
 
 const search = ref('')
 const sortMode = ref('default')
 const activeGroup = ref(null)
+const previewItem = ref(null)
+const previewPos = ref({ x: 0, y: 0 })
 
-// Reset search and group when items change (category switch)
+// Reset search, group, and any open preview when items change (category switch)
 watch(() => props.items, () => {
   search.value = ''
   activeGroup.value = null
   sortMode.value = 'default'
+  previewItem.value = null
+})
+
+function selectItem(item) {
+  previewItem.value = null
+  emit('select', item)
+}
+
+// Hover image preview — only on hover-capable (desktop) pointers
+const canHover = typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches
+function onRowEnter(item, e) {
+  if (canHover && item.image) {
+    previewItem.value = item
+    previewPos.value = { x: e.clientX, y: e.clientY }
+  }
+}
+function onRowMove(e) { if (previewItem.value) previewPos.value = { x: e.clientX, y: e.clientY } }
+function onRowLeave() { previewItem.value = null }
+
+// Local public assets are stored without a leading slash; resolve against the
+// app base (handles the /quadcalc/ GitHub Pages base). Full URLs pass through.
+function imgSrc(path) {
+  if (!path) return ''
+  return /^https?:\/\//.test(path) ? path : import.meta.env.BASE_URL + path.replace(/^\//, '')
+}
+
+// Position the preview to the left of the cursor (selector lives on the right),
+// flipping to the right and clamping to the viewport when there's no room.
+const previewStyle = computed(() => {
+  const w = 260, h = 260, gap = 20
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 1200
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 800
+  let left = previewPos.value.x - w - gap
+  if (left < 8) left = Math.min(previewPos.value.x + gap, vw - w - 8)
+  const top = Math.max(8, Math.min(previewPos.value.y - h / 2, vh - h - 8))
+  return { left: `${left}px`, top: `${top}px`, width: `${w}px` }
 })
 
 // Category-specific grouping keys
@@ -230,11 +284,17 @@ function heroSpecs(item) {
   return Object.fromEntries(entries.map(([k, v]) => [k, Array.isArray(v) ? v.join('/') : v]))
 }
 
+// Spec keys to omit from the list tags, per category (not useful for browsing)
+const HIDE_SPECS = { frame: ['material'] }
+
 function secondarySpecs(item) {
   if (!item.specs) return {}
   const cfg = GROUP_CONFIG[props.category]
   const heroKeys = cfg?.heroKeys || []
-  const entries = Object.entries(item.specs).filter(([k]) => !heroKeys.includes(k)).slice(0, 2)
+  const hideKeys = HIDE_SPECS[props.category] || []
+  const entries = Object.entries(item.specs)
+    .filter(([k]) => !heroKeys.includes(k) && !hideKeys.includes(k))
+    .slice(0, 2)
   return Object.fromEntries(entries.map(([k, v]) => [k, Array.isArray(v) ? v.join('/') : v]))
 }
 </script>
@@ -357,5 +417,41 @@ function secondarySpecs(item) {
   background: var(--qc-green-008);
   border: 1px solid var(--qc-green-02);
   white-space: nowrap;
+}
+
+/* "Has photo" hint badge */
+.img-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  font-size: 9px;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 0.5px;
+  padding: 1px 5px 1px 4px;
+  color: var(--qc-cyan);
+  background: var(--qc-cyan-008);
+  border: 1px solid var(--qc-cyan-03);
+}
+.img-badge svg { width: 11px; height: 11px; }
+.preset-item:hover .img-badge {
+  background: var(--qc-cyan-015);
+  box-shadow: var(--qc-glow-cyan);
+}
+
+/* Floating hover preview (teleported to <body>) */
+.img-preview {
+  position: fixed;
+  z-index: 60;
+  pointer-events: none;
+  padding: 5px;
+  background: var(--qc-surface-solid);
+  border: 1px solid var(--qc-cyan-03);
+  box-shadow: var(--qc-glow-cyan), 0 6px 28px rgba(0, 0, 0, 0.55);
+}
+.img-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 </style>

@@ -158,6 +158,14 @@
                 <li><strong>Battery:</strong> 6S is standard for 5" quads. 4S works but 6S is more efficient for the same power.</li>
               </ul>
             </section>
+
+            <section>
+              <h4>Credits &amp; Image Ownership</h4>
+              <ul>
+                <li>Component images are the property of their respective manufacturers and are shown for identification purposes only.</li>
+                <li>QuadCalc is not affiliated with or endorsed by any manufacturer or retailer.</li>
+              </ul>
+            </section>
           </div>
         </div>
       </div>

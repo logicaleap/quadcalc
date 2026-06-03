@@ -55,7 +55,7 @@
             <span class="flex items-center gap-1.5 min-w-0">
               <span class="text-tron-text-bright text-sm font-semibold font-[Rajdhani] truncate">{{ item.name }}</span>
               <span v-if="bundledBadge(item)" class="aio-badge" :title="bundledTitle(item)">{{ bundledBadge(item) }}</span>
-              <span v-if="item.image" class="img-badge" :title="`Hover to preview ${item.name}`">
+              <span v-if="item.image" class="img-badge" :title="`View photo of ${item.name}`" @click.stop="pinnedItem = item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
                 </svg>
@@ -89,10 +89,21 @@
       </div>
     </div>
 
-    <!-- Hover image preview (frames etc. that have an image) -->
+    <!-- Hover image preview (desktop) -->
     <Teleport to="body">
       <div v-if="previewItem" class="img-preview" :style="previewStyle">
         <img :src="imgSrc(previewItem.image)" :alt="previewItem.name" />
+      </div>
+    </Teleport>
+
+    <!-- Tap-to-view photo lightbox (works on touch + desktop) -->
+    <Teleport to="body">
+      <div v-if="pinnedItem" class="img-lightbox" @click="pinnedItem = null">
+        <div class="img-lightbox-card" @click.stop>
+          <button class="img-lightbox-close" @click="pinnedItem = null">✕</button>
+          <img :src="imgSrc(pinnedItem.image)" :alt="pinnedItem.name" />
+          <div class="img-lightbox-name">{{ pinnedItem.name }}</div>
+        </div>
       </div>
     </Teleport>
   </div>
@@ -115,6 +126,7 @@ const sortMode = ref('default')
 const activeGroup = ref(null)
 const previewItem = ref(null)
 const previewPos = ref({ x: 0, y: 0 })
+const pinnedItem = ref(null) // tap-to-view lightbox (mobile + desktop)
 
 // Reset search, group, and any open preview when items change (category switch)
 watch(() => props.items, () => {
@@ -122,6 +134,7 @@ watch(() => props.items, () => {
   activeGroup.value = null
   sortMode.value = 'default'
   previewItem.value = null
+  pinnedItem.value = null
 })
 
 function selectItem(item) {
@@ -434,9 +447,57 @@ function secondarySpecs(item) {
   border: 1px solid var(--qc-cyan-03);
 }
 .img-badge svg { width: 11px; height: 11px; }
+.img-badge { cursor: pointer; }
 .preset-item:hover .img-badge {
   background: var(--qc-cyan-015);
   box-shadow: var(--qc-glow-cyan);
+}
+.img-badge:hover { background: var(--qc-cyan-02); }
+
+/* Tap-to-view lightbox */
+.img-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: var(--qc-overlay);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.img-lightbox-card {
+  position: relative;
+  background: var(--qc-surface-solid);
+  border: 1px solid var(--qc-cyan-03);
+  box-shadow: var(--qc-glow-cyan), 0 8px 30px rgba(0, 0, 0, 0.5);
+  padding: 12px;
+  max-width: min(92vw, 420px);
+}
+.img-lightbox-card img { display: block; width: 100%; height: auto; }
+.img-lightbox-name {
+  margin-top: 8px;
+  text-align: center;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--qc-text-bright);
+}
+.img-lightbox-close {
+  position: absolute;
+  top: -12px;
+  right: -12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--qc-surface-solid);
+  border: 1px solid var(--qc-cyan-03);
+  color: var(--qc-cyan);
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Floating hover preview (teleported to <body>) */

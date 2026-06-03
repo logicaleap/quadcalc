@@ -75,9 +75,9 @@ const STEPS = [
     position: 'top',
   },
   {
-    title: 'Share Your Build',
-    text: 'Share a link to your build, copy a shopping list, or export as JSON/CSV to send to a friend.',
-    target: '.share-wrapper',
+    title: 'Export & Share',
+    text: 'Export your parts list with buy links, copy a shareable build link, or download as Markdown / CSV / JSON to send to a friend.',
+    target: '.export-btn',
     position: 'bottom',
   },
   {
